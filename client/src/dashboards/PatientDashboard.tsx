@@ -60,6 +60,11 @@ const PatientDashboard = () => {
                 <h3 className="text-lg font-medium text-light-text dark:text-dark-text">Pending Messages</h3>
                 <p className="text-2xl font-bold text-light-accent dark:text-dark-accent">3</p>
               </div>
+              
+                <div className="bg-light-surface dark:bg-dark-surface p-4 rounded-lg shadow-md">
+                  <h3 className="text-lg font-medium text-light-text dark:text-dark-text">Medical Adherance</h3>
+                  <p className="text-2xl font-bold text-light-accent dark:text-dark-accent">86%</p>
+                </div>
             </div>
           </div>
           {/* appointment card */}
