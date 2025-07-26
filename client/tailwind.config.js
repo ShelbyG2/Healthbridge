@@ -17,7 +17,7 @@ export default {
   'light-text': '#1E3A8A', // Primary blue from light mode
   'dark-text': '#F1F5F9', // Light off-white for dark mode primary text
 
-  'light-secondary': '#6B7280', // Gray for labels in light mode
+  'light-secondary': '#6B7280', // Gray for labels in light mozde
   'dark-secondary': '#94A3B8', // Lighter gray for labels in dark mode
 
   'light-accent': '#14B8A6', // Button teal in light mode

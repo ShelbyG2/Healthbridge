@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Home, CalendarClock, MessageCircleMore, User, LogOutIcon, MenuSquareIcon,X, Brain, Clock } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
+import Logo from '../../assets/logo2.png'
 import { toast } from 'react-hot-toast'
 const PatientNavBar = () => {
     const navigate = useNavigate()
@@ -11,8 +12,13 @@ const handleLogout = () => {
     toast.success("Logged out successfully");}
   return (
    <nav className='fixed lg:relative h-full bg-light-bg-shape2 left-0 z-50'>
+           
             {/* Desktop Nav */}
             <ul className='hidden lg:flex flex-col gap-4 p-4 rounded-lg text-white dark:text-dark-text h-full' >
+                 
+            <div className='flex items-center justify-center p-4'>
+                <img src={Logo} alt="Healthbridge Logo" className='w-18 h-16 rounded-full' />
+            </div>
                 <li className='flex items-center gap-2 bg-light-bg-highlight dark:bg-dark-bg-highlight p-2 rounded-md bg-opacity-20 hover:bg-light-hover dark:hover:bg-dark-hover' ><Home />Dashboard</li>
                     <li className='flex items-center gap-2  bg-light-bg-highlight dark:bg-dark-bg-highlight p-2 rounded-md bg-opacity-20 hover:bg-light-hover dark:hover:bg-dark-hover' ><CalendarClock /> Appointments</li>
                     <li className='flex items-center gap-2  bg-light-bg-highlight dark:bg-dark-bg-highlight p-2 rounded-md bg-opacity-20 hover:bg-light-hover dark:hover:bg-dark-hover' ><MessageCircleMore /> Chat</li>

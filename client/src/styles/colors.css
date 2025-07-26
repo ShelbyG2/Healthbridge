@@ -1,0 +1,41 @@
+/* Color palette derived from logo */
+:root {
+  /* Primary colors from logo */
+  --logo-teal: #4CA9A7;
+  --logo-blue: #16427B;
+  --logo-green: #A9CD5F;
+  
+  /* Light mode */
+  --light-bg: #F8FAFC;
+  --light-surface: #FFFFFF;
+  --light-text: var(--logo-blue); /* Updated to logo blue */
+  --light-secondary: #6B7280;
+  --light-accent: var(--logo-teal); /* Updated to logo teal */
+  --light-success: var(--logo-green); /* Updated to logo green */
+  --light-border: #E2F0F0; /* Lighter version of teal */
+  --light-input-text: var(--logo-blue);
+  --light-error: #DC2626;
+  --light-hover: #3D8A88; /* Darker teal for hover states */
+  --light-disabled: #E5E7EB;
+  --light-logo-blue: var(--logo-blue);
+  --light-bg-shape1: #F8FAFC;
+  --light-bg-highlight: #E2F0F0; /* Light teal for highlights */
+  --light-bg-shape2: var(--logo-blue);
+  
+  /* Dark mode */
+  --dark-bg: #0F172A;
+  --dark-surface: #1E293B;
+  --dark-text: #F1F5F9;
+  --dark-secondary: #94A3B8;
+  --dark-accent: var(--logo-teal); /* Using logo teal */
+  --dark-success: var(--logo-green); /* Using logo green */
+  --dark-border: #3D8A88; /* Darker teal for borders */
+  --dark-input-text: #F1F5F9;
+  --dark-error: #FF6B6B;
+  --dark-hover: #3D8A88; /* Darker teal for hover states */
+  --dark-disabled: #5C6770;
+  --dark-logo-blue: var(--logo-blue);
+  --dark-bg-shape1: #0F172A;
+  --dark-bg-highlight: #255B5A; /* Dark teal for highlights */
+  --dark-bg-shape2: #031230;
+}
