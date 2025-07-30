@@ -7,12 +7,12 @@ const DoctorDashboard = () => {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
     const name = user.name || "Doctor";
   return (
- <main className='main-container transition-colors duration-300  gap-4  dark:bg-dark-bg min-h-screen '>
-  <nav>
+ <main className='flex transition-colors duration-300 h-screen'>
+  <nav className='h-screen flex items-center  w-content bg-light-bg dark:bg-dark-bg shadow-md lg:shadow-none lg:bg-transparent lg:dark:bg-transparent'>
     <DoctorNavBar/>
   </nav>
     {/* hero section  */}
-    <div className="flex-1 p-6 w-full">
+    <div className="flex-1 p-6 w-full flex flex-col overflow-hidden">
       <header className='mb-6'>
         <h1 className='text-light-text dark:text-dark-text text-2xl lg:text-4xl font-bold mb-4'>
           Welcome back, Dr {name}
@@ -27,7 +27,7 @@ const DoctorDashboard = () => {
           />
         </div>
       </header>
-        <section className='main-container'>
+        <section className='flex-1 overflow-y-auto dashboard-grid pb-8'>
           {/* profile card */}
           <div className="flex-grow min-h-fit p-6 bg-gradient-to-r from-light-accent to-light-success dark:from-dark-accent dark:to-dark-success rounded-lg shadow-lg mb-6">
             <div className="flex items-center justify-between">

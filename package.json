@@ -1,0 +1,18 @@
+{
+  "name": "healthbridge",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "client": "npm start --prefix client",
+    "server": "npm run dev --prefix server",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "build": "npm-run-all build:client build:server",
+    "build:client": "npm run build --prefix client",
+    "build:server": "npm run build --prefix server"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.0",
+    "npm-run-all": "^4.1.5"
+   
+  }
+}
