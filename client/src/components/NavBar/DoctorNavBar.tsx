@@ -29,7 +29,6 @@ const DoctorNavBar = () => {
     }
     logout();
     navigate("/signin");
-    toast.success("Logged out successfully");
   };
 
   const [isOpen, setIsOpen] = useState(false);

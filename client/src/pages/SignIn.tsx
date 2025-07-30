@@ -37,19 +37,26 @@ const SignIn = () => {
           password,
         }),
       });
+      const data = await res.json();
       if (!res.ok) {
-        const data = await res.json();
         throw new Error(data.message || "Signin failed !");
       }
-      const data = await res.json();
       login(data.user);
       toast.success("Signin successful");
-
+      //Redirect to dashboard based on roles
       setTimeout(() => {
-        navigate("/dashboard");
+        if (data.user.role === "patient") {
+          navigate("/dashboard/patient");
+        } else if (data.user.role === "doctor") {
+          navigate("/dashboard/doctor");
+        } else if (data.user.role === "admin") {
+          navigate("/dashboard/admin");
+        } else {
+          throw new Error("Invalid user role");
+        }
       }, 500);
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error.message || "Signin failed");
     } finally {
       setLoading(false);
     }
