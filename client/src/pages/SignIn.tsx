@@ -1,4 +1,5 @@
 import { useState, useContext } from "react";
+import API_URL from "../lib/utils";
 import { AuthContext } from "../context/AuthProvider";
 import logo from "../assets/logo2.png";
 import { Link } from "react-router-dom";
@@ -26,7 +27,7 @@ const SignIn = () => {
     }
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:3000/api/auth/login", {
+      const res = await fetch(`${API_URL}/api/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

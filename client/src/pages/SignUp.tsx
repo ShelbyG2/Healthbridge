@@ -1,5 +1,5 @@
 import { useEffect, useState, useContext } from "react";
-
+import { API_URL } from "../lib/utils";
 import logo from "../assets/logo2.png";
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -54,7 +54,7 @@ const SignUp = () => {
     }
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:3000/api/auth/signup", {
+      const res = await fetch(`${API_URL}/api/auth/signup`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

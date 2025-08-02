@@ -7,9 +7,17 @@ import DoctorLayout from "./layouts/DoctorLayout";
 import { Route, Routes } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import ProtectedRoute from "./components/ProtectedRoutes";
-import PatientDashboard from "./dashboards/PatientDashboard";
+
 import AdminDashboard from "./dashboards/AdminDashboard";
 import DoctorDashboard from "./dashboards/DoctorDashboard";
+import {
+  PatientDashboard,
+  PatientAITriage,
+  PatientChat,
+  MedTracker,
+  PatientAppointments,
+  PatientSettings,
+} from "./pages/Patient";
 
 function App() {
   return (
@@ -57,6 +65,12 @@ function App() {
           >
             {/* Patient Routes */}
             <Route index element={<PatientDashboard />} />
+            <Route path="settings" element={<PatientSettings />} />
+            <Route path="appointments" element={<PatientAppointments />} />
+            <Route path="chat" element={<PatientChat />} />
+            <Route path="ai-triage" element={<PatientAITriage />} />
+            <Route path="med-tracker" element={<MedTracker />} />
+            <Route path="profile" element={<PatientSettings />} />
           </Route>
         </Route>
 

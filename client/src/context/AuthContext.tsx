@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
 import { AuthContext } from "./AuthProvider";
 import toast from "react-hot-toast";
+import { API_URL } from "../lib/utils";
 
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+
   const login = (userData) => {
     setIsAuthenticated(true);
     setUser(userData);
@@ -27,7 +29,7 @@ export const AuthProvider = ({ children }) => {
   };
   const checkAuth = async () => {
     try {
-      const res = await fetch("http://localhost:3000/api/auth/me", {
+      const res = await fetch(`${API_URL}/api/auth/me`, {
         credentials: "include",
       });
 

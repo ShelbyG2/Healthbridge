@@ -1,6 +1,7 @@
 import React from "react";
-import PatientDashboard from "../dashboards/PatientDashboard";
+import PatientDashboard from "../pages/Patient/PatientDashboard";
 import PatientNavBar from "../components/NavBar/PatientNavBar";
+import { Outlet } from "react-router-dom";
 
 const PatientLayout = () => {
   return (
@@ -8,7 +9,7 @@ const PatientLayout = () => {
       <nav className="h-screen flex items-center w-content bg-light-bg dark:bg-dark-bg shadow-md lg:shadow-none lg:bg-transparent lg:dark:bg-transparent">
         <PatientNavBar />
       </nav>
-      <PatientDashboard />
+      <Outlet />
     </main>
   );
 };

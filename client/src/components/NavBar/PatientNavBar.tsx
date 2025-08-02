@@ -15,6 +15,7 @@ import Logo from "../../assets/logo2.png";
 import { AuthContext } from "../../context/AuthProvider";
 import { toast } from "react-hot-toast";
 import { LoadSpinner } from "../LoadSpinner";
+
 const PatientNavBar = () => {
   const { logout, loading } = useContext(AuthContext);
   if (loading) {
@@ -37,33 +38,33 @@ const PatientNavBar = () => {
             className="w-18 h-16 rounded-full"
           />
         </div>
-        <Link to="/dashboard">
+        <Link to="/dashboard/patient">
           <li className="flex items-center gap-2 bg-light-bg-highlight dark:bg-dark-bg-highlight p-2 rounded-md bg-opacity-20 hover:bg-light-hover dark:hover:bg-dark-hover">
             <Home />
             Dashboard
           </li>
         </Link>
-        <Link to="/appointments">
+        <Link to="/dashboard/patient/appointments">
           <li className="flex items-center gap-2  bg-light-bg-highlight dark:bg-dark-bg-highlight p-2 rounded-md bg-opacity-20 hover:bg-light-hover dark:hover:bg-dark-hover">
             <CalendarClock /> Appointments
           </li>
         </Link>
-        <Link to="/chat">
+        <Link to="/dashboard/patient/chat">
           <li className="flex items-center gap-2  bg-light-bg-highlight dark:bg-dark-bg-highlight p-2 rounded-md bg-opacity-20 hover:bg-light-hover dark:hover:bg-dark-hover">
             <MessageCircleMore /> Chat
           </li>
         </Link>
-        <Link to="/ai-triage">
+        <Link to="/dashboard/patient/ai-triage">
           <li className="flex items-center gap-2  bg-light-bg-highlight dark:bg-dark-bg-highlight p-2 rounded-md bg-opacity-20 hover:bg-light-hover dark:hover:bg-dark-hover">
             <Brain /> AI Triage
           </li>
         </Link>
-        <Link to="/med-tracker">
+        <Link to="/dashboard/patient/med-tracker">
           <li className="flex items-center gap-2  bg-light-bg-highlight dark:bg-dark-bg-highlight p-2 rounded-md bg-opacity-20 hover:bg-light-hover dark:hover:bg-dark-hover">
             <Clock /> Med Tracker
           </li>
         </Link>
-        <Link to="/settings">
+        <Link to="/dashboard/patient/settings">
           <li className="flex items-center gap-2  bg-light-bg-highlight dark:bg-dark-bg-highlight p-2 rounded-md bg-opacity-20 hover:bg-light-hover dark:hover:bg-dark-hover">
             <Settings /> Settings
           </li>
@@ -94,35 +95,35 @@ const PatientNavBar = () => {
           >
             <X className="text-white dark:text-dark-text self-end" />
           </button>
-          <Link to="/dashboard">
+          <Link to="/dashboard/patient">
             <li className="flex items-center gap-2 bg-light-bg-highlight dark:bg-dark-bg-highlight p-2 rounded-md bg-opacity-20 hover:bg-light-hover dark:hover:bg-dark-hover">
               <Home />
               Dashboard
             </li>
           </Link>
-          <Link to="/appointments">
+          <Link to="/dashboard/patient/appointments">
             <li className="flex items-center gap-2  bg-light-bg-highlight dark:bg-dark-bg-highlight p-2 rounded-md bg-opacity-20 hover:bg-light-hover dark:hover:bg-dark-hover">
               <CalendarClock /> Appointments
             </li>
           </Link>
-          <Link to="/chat">
+          <Link to="/dashboard/patient/chat">
             <li className="flex items-center gap-2  bg-light-bg-highlight dark:bg-dark-bg-highlight p-2 rounded-md bg-opacity-20 hover:bg-light-hover dark:hover:bg-dark-hover">
               <MessageCircleMore /> Chat
             </li>
           </Link>
-          <Link to="/ai-triage">
+          <Link to="/dashboard/patient/ai-triage">
             <li className="flex items-center gap-2  bg-light-bg-highlight dark:bg-dark-bg-highlight p-2 rounded-md bg-opacity-20 hover:bg-light-hover dark:hover:bg-dark-hover">
               <Brain /> AI Triage
             </li>
           </Link>
-          <Link to="/med-tracker">
+          <Link to="/dashboard/patient/med-tracker">
             <li className="flex items-center gap-2  bg-light-bg-highlight dark:bg-dark-bg-highlight p-2 rounded-md bg-opacity-20 hover:bg-light-hover dark:hover:bg-dark-hover">
               <Clock /> Med Tracker
             </li>
           </Link>
-          <Link to="/profile">
+          <Link to="/dashboard/atient/profile">
             <li className="flex items-center gap-2  bg-light-bg-highlight dark:bg-dark-bg-highlight p-2 rounded-md bg-opacity-20 hover:bg-light-hover dark:hover:bg-dark-hover">
-              <User /> Profile
+              <Settings /> Settings
             </li>
           </Link>
           <li

@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 
-import Doctor from "../assets/doctor2.jpg";
-import { AuthContext } from "../context/AuthProvider";
+import Doctor from "../../assets/doctor2.jpg";
+import { AuthContext } from "../../context/AuthProvider";
 import {
   Brain,
   Clock,
@@ -301,7 +301,7 @@ const PatientDashboard = () => {
               Dr. Lee - 1:00 PM
             </li>
             <li className="text-light-secondary dark:text-dark-secondary">
-              {" "}
+              {""}
               Dr. Patel - 2:30 PM
             </li>
           </ul>
