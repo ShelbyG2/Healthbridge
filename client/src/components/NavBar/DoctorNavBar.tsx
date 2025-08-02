@@ -11,8 +11,6 @@ import {
   Clock,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import Logo from "../../assets/logo2.png";
-import toast from "react-hot-toast";
 import { AuthContext } from "../../context/AuthProvider";
 import LoadSpinner from "../LoadSpinner";
 const DoctorNavBar = () => {

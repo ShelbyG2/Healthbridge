@@ -1,4 +1,3 @@
-import React from "react";
 import DoctorDashboard from "../dashboards/DoctorDashboard";
 import DoctorNavBar from "../components/NavBar/DoctorNavBar";
 const DoctorLayout = () => {

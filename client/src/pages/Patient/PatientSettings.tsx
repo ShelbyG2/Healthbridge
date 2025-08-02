@@ -1,4 +1,3 @@
-import React from "react";
 import { useContext, useState } from "react";
 import { AuthContext } from "../../context/AuthProvider";
 import LoadSpinner from "../../components/LoadSpinner";
@@ -16,6 +15,19 @@ const PatientSettings = () => {
   const [email, setEmail] = useState(user.email || "");
   const [phone, setPhone] = useState(user.phone || "");
   const [address, setAddress] = useState(user.address || "");
+
+  const handleFullnameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFullname(e.target.value);
+  };
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(e.target.value);
+  };
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPhone(e.target.value);
+  };
+  const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setAddress(e.target.value);
+  };
   return (
     <div className="flex-1 p-6 w-full flex flex-col overflow-hidden">
       <header className="mb-6">
@@ -37,7 +49,8 @@ const PatientSettings = () => {
                 type="text"
                 id="name"
                 className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                defaultValue={user.fullname || ""}
+                value={fullname}
+                onChange={handleFullnameChange}
               />
             </div>
             <div>
@@ -48,7 +61,8 @@ const PatientSettings = () => {
                 type="email"
                 id="email"
                 className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                defaultValue={user.email || ""}
+                value={email}
+                onChange={handleEmailChange}
               />
             </div>
             <div>
@@ -59,6 +73,8 @@ const PatientSettings = () => {
                 type="tel"
                 id="phone"
                 className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                value={phone}
+                onChange={handlePhoneChange}
               />
             </div>
             <div>
@@ -69,6 +85,8 @@ const PatientSettings = () => {
                 type="text"
                 id="address"
                 className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                value={address}
+                onChange={handleAddressChange}
               />
             </div>
             <button className="bg-blue-500 text-white rounded-md p-2">

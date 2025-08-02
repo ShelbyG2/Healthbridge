@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext } from "react";
+import { useState } from "react";
 import { API_URL } from "../lib/utils";
 import logo from "../assets/logo2.png";
 import { Link } from "react-router-dom";
@@ -11,7 +11,6 @@ const SignUp = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [role, setRole] = useState("");
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -70,14 +69,13 @@ const SignUp = () => {
         const data = await res.json();
         throw new Error(data.message || "Signup failed");
       }
-      setIsAuthenticated(true);
       toast.success("Signup successful");
       setTimeout(() => {
         navigate("/login");
       });
       setLoading(false);
     } catch (error) {
-      toast.error(error.message || "Signup faled");
+      toast.error(error instanceof Error ? error.message : "Signup failed");
     } finally {
       setLoading(false);
     }

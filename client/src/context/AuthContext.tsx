@@ -1,19 +1,24 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, type ReactNode } from "react";
 import { AuthContext } from "./AuthProvider";
+import type { User } from "./AuthProvider";
 import toast from "react-hot-toast";
 import { API_URL } from "../lib/utils";
 
-export const AuthProvider = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+interface AuthProviderProps {
+  children: ReactNode;
+}
 
-  const login = (userData) => {
+export const AuthProvider = ({ children }: AuthProviderProps) => {
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  const login = (userData: User) => {
     setIsAuthenticated(true);
     setUser(userData);
   };
 
-  const logout = async () => {
+  const logout = async (): Promise<void> => {
     try {
       await fetch("/api/auth/logout", {
         method: "POST",
@@ -27,7 +32,8 @@ export const AuthProvider = ({ children }) => {
     }
     setIsAuthenticated(false);
   };
-  const checkAuth = async () => {
+
+  const checkAuth = async (): Promise<void> => {
     try {
       const res = await fetch(`${API_URL}/api/auth/me`, {
         credentials: "include",
@@ -37,7 +43,7 @@ export const AuthProvider = ({ children }) => {
 
       const data = await res.json();
       setIsAuthenticated(true);
-      setUser(data);
+      setUser(data as User);
     } catch (error) {
       console.error("Auth check failed:", error);
       setIsAuthenticated(false);

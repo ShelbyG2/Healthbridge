@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import { useContext } from "react";
 
 import Doctor from "../../assets/doctor2.jpg";
 import { AuthContext } from "../../context/AuthProvider";
@@ -45,14 +45,6 @@ const PatientDashboard = () => {
       time: "8:00 AM",
     },
     { id: 10, text: "Your health profile has been updated", time: "7:30 AM" },
-  ];
-
-  const appointments = [
-    { id: 1, date: "2023-10-01", time: "10:00 AM", doctor: "Dr. Smith" },
-    { id: 2, date: "2023-10-05", time: "2:00 PM", doctor: "Dr. Johnson" },
-    { id: 3, date: "2023-10-10", time: "1:30 PM", doctor: "Dr. Lee" },
-    { id: 4, date: "2023-10-15", time: "11:00 AM", doctor: "Dr. Brown" },
-    { id: 5, date: "2023-10-20", time: "3:00 PM", doctor: "Dr. Davis" },
   ];
 
   return (

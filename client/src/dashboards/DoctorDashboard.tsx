@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import { useContext } from "react";
 
 import Photo from "../assets/doctor2.jpg";
 import { ArrowRight, User2Icon } from "lucide-react";
@@ -6,7 +6,7 @@ import { AuthContext } from "../context/AuthProvider";
 
 const DoctorDashboard = () => {
   const { user } = useContext(AuthContext);
-  const name = user?.name || "Doctor";
+  const name = user?.fullname || "Doctor";
 
   return (
     <div className="flex-1 p-6 w-full flex flex-col overflow-hidden">

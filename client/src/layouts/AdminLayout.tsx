@@ -1,4 +1,3 @@
-import React from "react";
 import AdminDashboard from "../dashboards/AdminDashboard";
 import AdminNavBar from "../components/NavBar/AdminNavBar";
 const AdminLayout = () => {

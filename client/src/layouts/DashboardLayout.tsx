@@ -1,10 +1,7 @@
 import { useContext } from "react";
-import {
-  PatientDashBoard,
-  AdminDashboard,
-  DoctorDashboard,
-} from "../dashboards";
-import BackgroundImg from "../assets/lightbg.png";
+import AdminDashboard from "../dashboards/AdminDashboard";
+import DoctorDashboard from "../dashboards/DoctorDashboard";
+import { PatientDashboard } from "../pages/Patient";
 
 import { AuthContext } from "../context/AuthProvider";
 import Error401 from "../pages/Error401";
@@ -19,7 +16,7 @@ const DashboardLayout = () => {
 
   switch (role) {
     case "patient":
-      return <PatientDashBoard />;
+      return <PatientDashboard />;
     case "doctor":
       return <DoctorDashboard />;
     case "admin":

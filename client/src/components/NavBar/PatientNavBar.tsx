@@ -13,7 +13,6 @@ import {
 import { useNavigate, Link } from "react-router-dom";
 import Logo from "../../assets/logo2.png";
 import { AuthContext } from "../../context/AuthProvider";
-import { toast } from "react-hot-toast";
 import { LoadSpinner } from "../LoadSpinner";
 
 const PatientNavBar = () => {

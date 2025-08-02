@@ -1,5 +1,5 @@
 import { useState, useContext } from "react";
-import API_URL from "../lib/utils";
+import { API_URL } from "../lib/utils";
 import { AuthContext } from "../context/AuthProvider";
 import logo from "../assets/logo2.png";
 import { Link } from "react-router-dom";
@@ -57,7 +57,7 @@ const SignIn = () => {
         }
       }, 500);
     } catch (error) {
-      toast.error(error.message || "Signin failed");
+      toast.error(error instanceof Error ? error.message : "Signin failed");
     } finally {
       setLoading(false);
     }

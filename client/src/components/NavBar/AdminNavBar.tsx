@@ -1,7 +1,6 @@
 import { useState } from 'react'
-import { Home, Settings,Logs,ContactIcon,CalendarClock, NotebookPen, LogOutIcon, MenuSquareIcon,X, Brain } from 'lucide-react'
+import { Home, Settings,Logs,ContactIcon,CalendarClock, NotebookPen, LogOutIcon, MenuSquareIcon,X } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
-import Logo from '../../assets/logo2.png'
 import toast from 'react-hot-toast'
 const AdminNavBar = () => {
     const navigate=useNavigate()
