@@ -86,7 +86,11 @@ const PatientSettings = () => {
       }
       toast.success(data.message || "Password updated successfully");
     } catch (error) {
-      toast.error((error as Error).message || "Failed to update password");
+      toast.error(
+        error instanceof Error
+          ? error.message || "Failed to update password"
+          : "Failed to update password"
+      );
     }
   };
   return (
