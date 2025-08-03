@@ -23,6 +23,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       await fetch("/api/auth/logout", {
         method: "POST",
         credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
       });
       setUser(null);
       toast.success("Logged out successfully");
@@ -37,6 +40,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     try {
       const res = await fetch(`${API_URL}/api/auth/me`, {
         credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
       });
 
       if (!res.ok) throw new Error("Not Authenticated!");

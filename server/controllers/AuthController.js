@@ -54,9 +54,10 @@ export const logIn = async (req, res) => {
     const token = generateToken(user);
     res.cookie("token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
-      maxAge: 24 * 60 * 60 * 1000,
+      secure: true, // Required for HTTPS
+      sameSite: "none", // Required for cross-origin
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+      domain: ".onrender.com", // Allow sharing between subdomains
     });
     res.status(200).json({
       message: "Logged in succesfully",
