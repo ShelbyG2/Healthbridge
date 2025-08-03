@@ -10,6 +10,16 @@ import UserRoutes from "./routes/UserRoutes.js";
 
 dotenv.config();
 
+// Check for required environment variables
+const requiredEnvVars = ['MONGODB_URI', 'JWT_SECRET'];
+const missingEnvVars = requiredEnvVars.filter(varName => !process.env[varName]);
+
+if (missingEnvVars.length > 0) {
+  console.error('Missing required environment variables:', missingEnvVars);
+  console.error('Please set these environment variables before starting the server.');
+  process.exit(1);
+}
+
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
@@ -31,27 +41,34 @@ app.use(
 const port = process.env.PORT || 3000;
 
 // Add error handling for database connection
-connectDB().then(() => {
-  console.log("Database connected successfully");
-}).catch((error) => {
-  console.error("Database connection failed:", error);
-  process.exit(1);
-});
+const startServer = async () => {
+  try {
+    await connectDB();
+    console.log("Database connected successfully");
+    
+    // Start server after database connection
+    const server = app.listen(port, () => {
+      console.log(`Server is running on port ${port}`);
+      console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+      console.log(`CORS origins: ${process.env.CLIENT_URL || 'http://localhost:5173'}, https://healthbridge-client.onrender.com`);
+    });
 
-// Add error handling for server startup
-const server = app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`CORS origins: ${process.env.CLIENT_URL || 'http://localhost:5173'}, https://healthbridge-client.onrender.com`);
-});
-
-// Handle server errors
-server.on('error', (error) => {
-  console.error('Server error:', error);
-  if (error.code === 'EADDRINUSE') {
-    console.error(`Port ${port} is already in use`);
+    // Handle server errors
+    server.on('error', (error) => {
+      console.error('Server error:', error);
+      if (error.code === 'EADDRINUSE') {
+        console.error(`Port ${port} is already in use`);
+      }
+    });
+  } catch (error) {
+    console.error("Database connection failed:", error);
+    process.exit(1);
   }
-});
+};
+
+startServer();
+
+
 
 app.get("/", (req, res) => {
   res.send("Welcome To the HealthBridge Server");
