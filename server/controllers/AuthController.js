@@ -54,10 +54,10 @@ export const logIn = async (req, res) => {
     const token = generateToken(user);
     res.cookie("token", token, {
       httpOnly: true,
-      secure: true, // Required for HTTPS
-      sameSite: "none", // Required for cross-origin
+      secure: process.env.NODE_ENV === "production", // Only secure in production
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // Adjust based on environment
       maxAge: 24 * 60 * 60 * 1000, // 24 hours
-      domain: ".onrender.com", // Allow sharing between subdomains
+      path: "/",
     });
     res.status(200).json({
       message: "Logged in succesfully",
@@ -89,6 +89,21 @@ export const Me = async (req, res) => {
     }
     res.status(200).json(user);
   } catch (error) {
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const logOut = async (req, res) => {
+  try {
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      path: "/",
+    });
+    res.status(200).json({ message: "Logged out successfully" });
+  } catch (error) {
+    console.error("Logout error:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };

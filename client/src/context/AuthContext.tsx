@@ -20,7 +20,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const logout = async (): Promise<void> => {
     try {
-      await fetch("/api/auth/logout", {
+      await fetch(`${API_URL}/api/auth/logout`, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -28,12 +28,15 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         },
       });
       setUser(null);
+      setIsAuthenticated(false);
       toast.success("Logged out successfully");
     } catch (error) {
       console.error(error);
       toast.error("Failed to logout");
+      // Still clear local state even if server request fails
+      setUser(null);
+      setIsAuthenticated(false);
     }
-    setIsAuthenticated(false);
   };
 
   const checkAuth = async (): Promise<void> => {
@@ -45,7 +48,16 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         },
       });
 
-      if (!res.ok) throw new Error("Not Authenticated!");
+      if (!res.ok) {
+        if (res.status === 401) {
+          // User is not authenticated, clear any existing state
+          setIsAuthenticated(false);
+          setUser(null);
+        } else {
+          throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+        }
+        return;
+      }
 
       const data = await res.json();
       setIsAuthenticated(true);
