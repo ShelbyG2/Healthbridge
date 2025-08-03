@@ -55,7 +55,7 @@ export const logIn = async (req, res) => {
     res.cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "Strict",
+      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
       maxAge: 24 * 60 * 60 * 1000,
     });
     res.status(200).json({
@@ -88,7 +88,6 @@ export const Me = async (req, res) => {
     }
     res.status(200).json(user);
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: "Internal server error" });
   }
 };

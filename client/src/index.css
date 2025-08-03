@@ -3,29 +3,45 @@
 @tailwind utilities;
 
 @keyframes slide-in-left {
-  from { transform: translateX(-100%); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
 @keyframes slide-in-right {
-  from { transform: translateX(100%); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
 @keyframes card-3d {
-  from { transform: perspective(600px) rotateY(20deg) scale(0.95); opacity: 0; }
-  to { transform: perspective(600px) rotateY(0deg) scale(1); opacity: 1; }
+  from {
+    transform: perspective(600px) rotateY(20deg) scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: perspective(600px) rotateY(0deg) scale(1);
+    opacity: 1;
+  }
 }
 
 .animate-slide-in-left {
-  animation: slide-in-left 0.8s cubic-bezier(0.4,0,0.2,1) forwards;
+  animation: slide-in-left 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 .animate-slide-in-right {
-  animation: slide-in-right 0.8s cubic-bezier(0.4,0,0.2,1) forwards;
+  animation: slide-in-right 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 .animate-card-3d {
-  animation: card-3d 0.8s cubic-bezier(0.4,0,0.2,1) forwards;
+  animation: card-3d 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
-
-
 
 @keyframes drop-bounce {
   0% {
@@ -45,10 +61,12 @@
 }
 
 .animate-drop-bounce {
-  animation: drop-bounce 0.9s cubic-bezier(0.4,0,0.2,1) forwards;
+  animation: drop-bounce 0.9s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 @keyframes scale {
-  0%, 40%, 100% {
+  0%,
+  40%,
+  100% {
     transform: scaleY(0.05);
   }
   20% {
@@ -60,20 +78,20 @@
   animation-name: scale;
 }
 
-.main-container{
+.main-container {
   display: flex;
   gap: 1rem;
   width: 100%;
 }
 
-.dashboard-grid{
+.dashboard-grid {
   display: flex;
   gap: 1rem;
   flex-wrap: wrap;
   width: 100%;
 }
 
-.new-card{
+.new-card {
   flex-grow: 0;
   flex-shrink: 0;
   width: 100%;
@@ -98,3 +116,21 @@
   }
 }
 
+.form-input {
+  @apply w-full px-4 py-2 rounded-lg border border-light-border dark:border-dark-border 
+         bg-light-surface dark:bg-dark-surface text-light-secondary dark:text-dark-secondary
+         focus:ring-2 focus:ring-blue-500 focus:border-transparent 
+         transition-colors outline-none;
+}
+
+.form-label {
+  @apply block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1;
+}
+
+.card-header {
+  @apply flex items-center justify-between mb-6 text-light-text dark:text-dark-text;
+}
+
+.button-primary {
+  @apply bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors;
+}
