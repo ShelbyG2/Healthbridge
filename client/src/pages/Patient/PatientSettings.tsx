@@ -63,7 +63,11 @@ const PatientSettings = () => {
       }
       toast.success(data.message || "Profile updated successfully");
     } catch (error) {
-      toast.error(error.message || "Failed to update profile");
+      toast.error(
+        error instanceof Error
+          ? error.message || "Failed to update profile"
+          : "Failed to update profile"
+      );
     }
   };
   const handlePasswordUpdate = async (e: React.FormEvent) => {
