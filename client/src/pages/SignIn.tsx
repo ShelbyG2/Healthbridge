@@ -44,7 +44,7 @@ const SignIn = () => {
       }
       login(data.user);
       toast.success("Signin successful");
-      //Redirect to dashboard based on roles
+
       setTimeout(() => {
         if (data.user.role === "patient") {
           navigate("/dashboard/patient");

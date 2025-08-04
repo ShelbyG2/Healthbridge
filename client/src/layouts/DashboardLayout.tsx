@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import AdminDashboard from "../dashboards/AdminDashboard";
-import DoctorDashboard from "../dashboards/DoctorDashboard";
+import DoctorDashboard from "../pages/Doctor/DoctorDashboard";
 import { PatientDashboard } from "../pages/Patient";
 
 import { AuthContext } from "../context/AuthProvider";

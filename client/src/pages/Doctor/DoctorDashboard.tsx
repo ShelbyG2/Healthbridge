@@ -1,12 +1,12 @@
 import { useContext } from "react";
 
-import Photo from "../assets/doctor2.jpg";
+import Photo from "../../assets/doctor2.jpg";
 import { ArrowRight, User2Icon } from "lucide-react";
-import { AuthContext } from "../context/AuthProvider";
+import { AuthContext } from "../../context/AuthProvider";
 
 const DoctorDashboard = () => {
   const { user } = useContext(AuthContext);
-  const name = user?.fullname || "Doctor";
+  const name = user?.fullname;
 
   return (
     <div className="flex-1 p-6 w-full flex flex-col overflow-hidden">
@@ -24,9 +24,9 @@ const DoctorDashboard = () => {
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
           >
             <circle cx="11" cy="11" r="8"></circle>
             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
@@ -34,7 +34,7 @@ const DoctorDashboard = () => {
           <input
             type="text"
             placeholder="Search patients, appointments, records..."
-            className="bg-white dark:bg-dark-surface border border-light-border dark:border-dark-border rounded-lg py-3 px-10 w-full shadow-sm focus:outline-none focus:ring-2 focus:ring-light-accent dark:focus:ring-dark-accent transition-all duration-300"
+            className="bg-white  dark:bg-dark-surface border border-light-border dark:border-dark-border rounded-lg py-3 px-10 w-full shadow-sm focus:outline-none focus:ring-2 focus:ring-light-accent dark:focus:ring-dark-accent transition-all duration-300"
           />
         </div>
       </header>
@@ -191,9 +191,9 @@ const DoctorDashboard = () => {
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                   className="text-light-accent dark:text-dark-accent"
                 >
                   <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
@@ -211,9 +211,9 @@ const DoctorDashboard = () => {
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                   className="text-light-success dark:text-dark-success"
                 >
                   <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>

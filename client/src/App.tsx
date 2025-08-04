@@ -9,7 +9,15 @@ import { Toaster } from "react-hot-toast";
 import ProtectedRoute from "./components/ProtectedRoutes";
 
 import AdminDashboard from "./dashboards/AdminDashboard";
-import DoctorDashboard from "./dashboards/DoctorDashboard";
+import {
+  DoctorAITriage,
+  DoctorAppointments,
+  DoctorChat,
+  DoctorDashboard,
+  DoctorPatients,
+  DoctorReferrals,
+  DoctorSettings,
+} from "./pages/Doctor";
 import {
   PatientDashboard,
   PatientAITriage,
@@ -53,6 +61,12 @@ function App() {
           >
             {/* Doctor Routes */}
             <Route index element={<DoctorDashboard />} />
+            <Route path="appointments" element={<DoctorAppointments />} />
+            <Route path="patients" element={<DoctorPatients />} />
+            <Route path="settings" element={<DoctorSettings />} />
+            <Route path="referrals" element={<DoctorReferrals />} />
+            <Route path="chat" element={<DoctorChat />} />
+            <Route path="ai-triage" element={<DoctorAITriage />} />
           </Route>
           {/* Patient */}
           <Route
