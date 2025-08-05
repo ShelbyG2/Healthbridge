@@ -4,19 +4,14 @@ import LoadSpinner from "../../components/LoadSpinner";
 import { toast } from "react-hot-toast";
 import ToggleSwitch from "../../components/ui/ToggleBtn";
 import { API_URL } from "../../lib/utils";
+import FileUploader from "../../components/ui/FileUploader";
 import {
   Camera,
-  Lock,
   Shield,
   UserCog,
-  Phone,
-  Mail,
-  MapPin,
-  Book,
   Award,
   AlertCircle,
   Clock,
-  Calendar,
   BookmarkPlus,
 } from "lucide-react";
 
@@ -28,42 +23,21 @@ const DoctorSettings = () => {
   if (!user) {
     return toast.error("Failed to load user data");
   }
+  // profile information
   const [fullname, setFullname] = useState(user.fullname || "");
   const [email, setEmail] = useState(user.email || "");
   const [phone, setPhone] = useState(user.phone || "");
   const [address, setAddress] = useState(user.address || "");
   const [gender, setGender] = useState(user.gender || "");
   const [DOB, setDOB] = useState(user.DOB || "");
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-
-  // Add new state for professional details
-  const [specialization, setSpecialization] = useState(
-    user.specialization || ""
-  );
-  const [licenseNumber, setLicenseNumber] = useState(user.licenseNumber || "");
-  const [experience, setExperience] = useState(user.experience || "");
-  const [education, setEducation] = useState(user.education || "");
-  const [availability, setAvailability] = useState(user.availability || false);
-  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
-
-  // Add new state for additional features
-  const [isUpdating, setIsUpdating] = useState(false);
   const [profileImage, setProfileImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>(
     user.profileImage || "default-avatar.png"
   );
-  const [workingHours, setWorkingHours] = useState({
-    monday: { start: "09:00", end: "17:00", isWorking: true },
-    tuesday: { start: "09:00", end: "17:00", isWorking: true },
-    wednesday: { start: "09:00", end: "17:00", isWorking: true },
-    thursday: { start: "09:00", end: "17:00", isWorking: true },
-    friday: { start: "09:00", end: "17:00", isWorking: true },
-    saturday: { start: "09:00", end: "13:00", isWorking: false },
-    sunday: { start: "09:00", end: "13:00", isWorking: false },
-  });
-  const [certifications, setCertifications] = useState<string[]>([]);
-  const [newCertification, setNewCertification] = useState("");
+  const [uploadProgress, setUploadProgress] = useState<number>(0);
+  const [uploadedImageUrl, setUploadedImageUrl] = useState<string>(
+    user.profileImage || ""
+  );
 
   const handleFullnameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFullname(e.target.value);
@@ -87,11 +61,56 @@ const DoctorSettings = () => {
   };
 
   // Add image upload handler
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (file: File) => {
+    setUploadProgress(0);
+    const formData = new FormData();
+    formData.append("image", file);
+
+    return new Promise<string>((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open("POST", `${API_URL}/api/upload/profile-image`, true);
+      xhr.withCredentials = true;
+
+      xhr.upload.onprogress = (event) => {
+        if (event.lengthComputable) {
+          setUploadProgress(Math.round((event.loaded / event.total) * 100));
+        }
+      };
+
+      xhr.onload = () => {
+        if (xhr.status === 200) {
+          const data = JSON.parse(xhr.responseText);
+          setUploadedImageUrl(data.imageUrl);
+          toast.success("Image uploaded!");
+          resolve(data.imageUrl);
+        } else {
+          toast.error("Image upload failed");
+          reject(new Error("Upload failed"));
+        }
+        setUploadProgress(0);
+      };
+
+      xhr.onerror = () => {
+        toast.error("Image upload failed");
+        setUploadProgress(0);
+        reject(new Error("Upload failed"));
+      };
+
+      xhr.send(formData);
+    });
+  };
+  const onProfileImageChange = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = e.target.files?.[0];
     if (file) {
-      setProfileImage(file);
       setPreviewUrl(URL.createObjectURL(file));
+      try {
+        const url = await handleImageUpload(file);
+        setUploadedImageUrl(url);
+      } catch {
+        setPreviewUrl(user.profileImage || "default-avatar.png");
+      }
     }
   };
 
@@ -106,21 +125,19 @@ const DoctorSettings = () => {
       formData.append("email", email);
       formData.append("phone", phone);
       formData.append("address", address);
-      formData.append("gender", gender);
-      formData.append("DOB", DOB);
-      if (profileImage) {
-        formData.append("profileImage", profileImage);
-      }
+      formData.append("profileImageUrl", uploadedImageUrl || "");
+      formData.append("gender", gender || "");
+      formData.append("DOB", DOB || "");
 
       const res = await fetch(`${API_URL}/api/user/profile`, {
         method: "PUT",
-        credentials: "include",
         body: formData,
+        credentials: "include",
       });
-
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message);
-
+      if (!res.ok) {
+        throw new Error(data.message || "Failed to update profile");
+      }
       toast.success(data.message || "Profile updated successfully");
     } catch (error) {
       toast.error(
@@ -133,14 +150,34 @@ const DoctorSettings = () => {
     }
   };
 
-  // Add certification handler
-  const handleAddCertification = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (newCertification.trim()) {
-      setCertifications([...certifications, newCertification.trim()]);
-      setNewCertification("");
-    }
-  };
+  // professional information
+  const [specialization, setSpecialization] = useState(
+    user.specialization || ""
+  );
+  const [licenseNumber, setLicenseNumber] = useState(user.licenseNumber || "");
+  const [experience, setExperience] = useState(user.experience || "");
+  const [education, setEducation] = useState(user.education || "");
+
+  // Availability & notifications
+  const [availability, setAvailability] = useState(user.availability || false);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+
+  //Security settings
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+
+  //Working hours
+  const [workingHours, setWorkingHours] = useState({
+    monday: { start: "09:00", end: "17:00", isWorking: true },
+    tuesday: { start: "09:00", end: "17:00", isWorking: true },
+    wednesday: { start: "09:00", end: "17:00", isWorking: true },
+    thursday: { start: "09:00", end: "17:00", isWorking: true },
+    friday: { start: "09:00", end: "17:00", isWorking: true },
+    saturday: { start: "09:00", end: "13:00", isWorking: false },
+    sunday: { start: "09:00", end: "13:00", isWorking: false },
+  });
+
+  const [isUpdating, setIsUpdating] = useState(false);
 
   // Add working hours handler
   const handleWorkingHoursChange = (
@@ -201,26 +238,35 @@ const DoctorSettings = () => {
               <UserCog />
               <h2 className="text-xl font-semibold">Personal Information</h2>
             </div>
-            <div className="flex items-center flex-grow gap-6 mb-6">
-              <div className="relative">
-                <img
-                  src={previewUrl}
-                  alt="Profile"
-                  className="w-24 h-24 rounded-full object-cover border-4 border-white dark:border-gray-800 shadow-lg"
-                />
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                />
-                <button className="absolute bottom-0 right-0 p-2 bg-blue-500 rounded-full text-white hover:bg-blue-600 transition-colors">
-                  <Camera size={16} />
-                </button>
-              </div>
-            </div>
-            <div className="flex items-center justify-between mb-6"></div>
             <form className="space-y-4" onSubmit={handleProfileUpdate}>
+              <div className="flex items-center flex-grow gap-6 mb-6">
+                <div className="relative">
+                  <img
+                    src={previewUrl}
+                    alt="Profile"
+                    className="w-24 h-24 rounded-full object-cover border-4 border-white dark:border-gray-800 shadow-lg"
+                  />
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={onProfileImageChange}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  />
+                  <button className="absolute bottom-0 right-0 p-2 bg-blue-500 rounded-full text-white hover:bg-blue-600 transition-colors">
+                    <Camera size={16} />
+                  </button>
+                  {uploadProgress > 0 && (
+                    <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+                      <div
+                        className="bg-blue-500 h-2 rounded-full transition-all"
+                        style={{ width: `${uploadProgress}%` }}
+                      ></div>
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div className="flex items-center justify-between mb-6"></div>
+
               <div className="space-y-2">
                 <label htmlFor="name" className="form-label">
                   Full Name
@@ -378,47 +424,20 @@ const DoctorSettings = () => {
                     placeholder="e.g., MD, University"
                   />
                 </div>
-                <div className="p-6">
-                  <div className="flex items-center justify-between mb-6">
-                    <div className="flex items-center gap-2">
-                      <BookmarkPlus className="w-5 h-5 text-blue-500" />
+                <div className="p-6 w-full ">
+                  <div className="flex  justify-between mb-6">
+                    <div className="card-header">
+                      <BookmarkPlus className="w-5 h-5" />
                       <h2 className="text-xl font-semibold">Certifications</h2>
                     </div>
                   </div>
-                  <form onSubmit={handleAddCertification} className="mb-4">
-                    <div className="flex gap-2">
-                      <input
-                        type="file"
-                        value={newCertification}
-                        onChange={(e) => setNewCertification(e.target.value)}
-                        placeholder="Add a certification"
-                        className="form-input flex-1"
-                      />
-                      <button type="submit" className="button-primary px-4">
-                        Add
-                      </button>
-                    </div>
-                  </form>
-                  <div className="space-y-2">
-                    {certifications.map((cert, index) => (
-                      <div
-                        key={index}
-                        className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-700 rounded"
-                      >
-                        <span>{cert}</span>
-                        <button
-                          onClick={() =>
-                            setCertifications(
-                              certifications.filter((_, i) => i !== index)
-                            )
-                          }
-                          className="text-red-500 hover:text-red-600"
-                        >
-                          Remove
-                        </button>
-                      </div>
-                    ))}
-                  </div>
+
+                  <FileUploader
+                    onFilesSelected={(files) => setCertifications(files)}
+                  />
+                  <button className="button-primary mt-4 w-fit h-fit">
+                    Upload
+                  </button>
                 </div>
               </div>
               <button type="submit" className="button-primary w-full">
@@ -432,8 +451,8 @@ const DoctorSettings = () => {
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
           <div className="p-6">
             <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-2">
-                <Clock className="w-5 h-5 text-blue-500" />
+              <div className="flex items-center gap-2 card-header">
+                <Clock className="w-5 h-5" />
                 <h2 className="text-xl font-semibold">
                   Availability & Preferences
                 </h2>
@@ -442,8 +461,10 @@ const DoctorSettings = () => {
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="font-medium">Available for Appointments</h3>
-                  <p className="text-sm text-gray-500">
+                  <h3 className="font-medium text-light-text/80 dark:text-dark-text/80">
+                    Available for Appointments
+                  </h3>
+                  <p className="text-sm text-light-secondary dark:text-dark-secondary">
                     Toggle your availability for new appointments
                   </p>
                 </div>
@@ -454,8 +475,10 @@ const DoctorSettings = () => {
               </div>
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="font-medium">Email Notifications</h3>
-                  <p className="text-sm text-gray-500">
+                  <h3 className="font-medium text-light-text/80 dark:text-dark-text/80">
+                    Email Notifications
+                  </h3>
+                  <p className="text-sm text-light-secondary dark:text-dark-secondary">
                     Receive email notifications for new appointments
                   </p>
                 </div>
@@ -472,8 +495,8 @@ const DoctorSettings = () => {
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
           <div className="p-6">
             <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-2">
-                <Shield className="w-5 h-5 text-blue-500" />
+              <div className="flex items-center gap-2 card-header">
+                <Shield className="w-5 h-5 " />
                 <h2 className="text-xl font-semibold">Security</h2>
               </div>
             </div>
@@ -529,14 +552,14 @@ const DoctorSettings = () => {
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
           <div className="p-6">
             <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-2">
-                <Clock className="w-5 h-5 text-blue-500" />
+              <div className="flex items-center gap-2 card-header">
+                <Clock className="w-5 h-5 " />
                 <h2 className="text-xl font-semibold">Working Hours</h2>
               </div>
             </div>
             <div className="space-y-4">
               {Object.entries(workingHours).map(([day, hours]) => (
-                <div key={day} className="flex items-center gap-4">
+                <div key={day} className="flex items-center gap-4 form-label">
                   <div className="w-24 capitalize">{day}</div>
                   <ToggleSwitch
                     checked={hours.isWorking}
@@ -570,8 +593,6 @@ const DoctorSettings = () => {
             </div>
           </div>
         </div>
-
-        {/* Add Certifications Section */}
       </section>
     </div>
   );
