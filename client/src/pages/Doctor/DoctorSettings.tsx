@@ -4,7 +4,7 @@ import LoadSpinner from "../../components/LoadSpinner";
 import { toast } from "react-hot-toast";
 import ToggleSwitch from "../../components/ui/ToggleBtn";
 import { API_URL } from "../../lib/utils";
-import FileUploader from "../../components/ui/FileUploader";
+// import FileUploader from "../../components/ui/FileUploader";
 import {
   Camera,
   Shield,
