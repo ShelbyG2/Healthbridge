@@ -6,7 +6,7 @@ import { ProfileImageUpload } from "../controllers/UploadsController.js";
 const router = express.Router();
 
 router.post(
-  "/upload/profile-image",
+  "/profile-image",
   protect,
   upload.single("image"),
   ProfileImageUpload

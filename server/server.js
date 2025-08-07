@@ -3,7 +3,6 @@ import cors from "cors";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import connectDB from "./config/db.js";
-import { protect } from "./middleware/AuthMiddleware.js";
 import AuthRoutes from "./routes/Authroutes.js";
 import AdminRoutes from "./routes/AdminRoutes.js";
 import UserRoutes from "./routes/UserRoutes.js";
@@ -17,8 +16,8 @@ app.use(cookieParser());
 app.use(
   cors({
     origin: [
-      process.env.CLIENT_URL || "http://localhost:5173",
-      "http://192.168.100.13:5173", // Android  - client
+      "http://192.168.100.2:5173", // Your laptop IP
+      "http://localhost:5173",
       "https://healthbridge-client.onrender.com",
     ],
     credentials: true,

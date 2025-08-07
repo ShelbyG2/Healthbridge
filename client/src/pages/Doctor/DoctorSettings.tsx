@@ -431,10 +431,10 @@ const DoctorSettings = () => {
                       <h2 className="text-xl font-semibold">Certifications</h2>
                     </div>
                   </div>
-
+                  {/* 
                   <FileUploader
                     onFilesSelected={(files) => setCertifications(files)}
-                  />
+                  /> */}
                   <button className="button-primary mt-4 w-fit h-fit">
                     Upload
                   </button>
