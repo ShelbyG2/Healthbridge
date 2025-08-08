@@ -1,4 +1,4 @@
-import {User} from "../models/User.js";
+import { User } from "../models/User.js";
 export const ProfileImageUpload = async (req, res) => {
   try {
     const imageUrl = req.file.path;

@@ -29,7 +29,7 @@ const DoctorSettings = () => {
   const [phone, setPhone] = useState(user.phone || "");
   const [address, setAddress] = useState(user.address || "");
   const [gender, setGender] = useState(user.gender || "");
-  const [DOB, setDOB] = useState(user.DOB || "");
+  const [dateOfBirth, setDateOfBirth] = useState(user.dateOfBirth || "");
   const [profileImage, setProfileImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>(
     user.profileImage || "default-avatar.png"
@@ -38,6 +38,15 @@ const DoctorSettings = () => {
   const [uploadedImageUrl, setUploadedImageUrl] = useState<string>(
     user.profileImage || ""
   );
+
+  const formatDate = (dateString: string) => {
+    if (!dateString) return "";
+    const d = new Date(dateString);
+    // Pad month and day with leading zeros
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${d.getFullYear()}-${month}-${day}`;
+  };
 
   const handleFullnameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFullname(e.target.value);
@@ -120,18 +129,20 @@ const DoctorSettings = () => {
     setIsUpdating(true);
 
     try {
-      const formData = new FormData();
-      formData.append("fullname", fullname);
-      formData.append("email", email);
-      formData.append("phone", phone);
-      formData.append("address", address);
-      formData.append("profileImageUrl", uploadedImageUrl || "");
-      formData.append("gender", gender || "");
-      formData.append("DOB", DOB || "");
-
       const res = await fetch(`${API_URL}/api/user/profile`, {
         method: "PUT",
-        body: formData,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          fullname: fullname,
+          email: email,
+          phone: phone,
+          address: address,
+          profileImageUrl: uploadedImageUrl || "",
+          gender: gender,
+          dateOfBirth: dateOfBirth,
+        }),
         credentials: "include",
       });
       const data = await res.json();
@@ -311,7 +322,9 @@ const DoctorSettings = () => {
                     </select>
                   </div>
                   <input
-                    type="number"
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
                     placeholder="+1 (555) 000-000"
                     className="w-full pl-[4.5rem] pr-3  bg-transparent  py-2 rounded-lg border border-light-border dark:border-dark-border 
          bg-light-surface dark:bg-dark-surface text-light-secondary dark:text-dark-secondary
@@ -360,8 +373,8 @@ const DoctorSettings = () => {
                   <input
                     type="date"
                     id="dob"
-                    value={DOB}
-                    onChange={(e) => setDOB(e.target.value)}
+                    value={formatDate(dateOfBirth)}
+                    onChange={(e) => setDateOfBirth(e.target.value)}
                     className="form-input"
                   />
                 </div>
