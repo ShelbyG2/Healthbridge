@@ -1,14 +1,17 @@
-import { useState } from "react";
+import React from "react";
 
-export default function ToggleSwitch() {
-  const [checked, setChecked] = useState(false);
+interface ToggleSwitchProps {
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+}
 
+export default function ToggleSwitch({ checked, onChange }: ToggleSwitchProps) {
   return (
     <label className="relative inline-block w-[3.5em] h-[2em]">
       <input
         type="checkbox"
         checked={checked}
-        onChange={() => setChecked(!checked)}
+        onChange={() => onChange(!checked)}
         className="hidden"
       />
       <span

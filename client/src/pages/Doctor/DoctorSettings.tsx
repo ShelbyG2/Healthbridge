@@ -177,31 +177,29 @@ const DoctorSettings = () => {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
 
-  //Working hours
-  const [workingHours, setWorkingHours] = useState({
-    monday: { start: "09:00", end: "17:00", isWorking: true },
-    tuesday: { start: "09:00", end: "17:00", isWorking: true },
-    wednesday: { start: "09:00", end: "17:00", isWorking: true },
-    thursday: { start: "09:00", end: "17:00", isWorking: true },
-    friday: { start: "09:00", end: "17:00", isWorking: true },
-    saturday: { start: "09:00", end: "13:00", isWorking: false },
-    sunday: { start: "09:00", end: "13:00", isWorking: false },
-  });
+  //Working slots
+  const [startTime, setStartTime] = useState("09:00 AM");
+  const [endTime, setEndTime] = useState("04:00 PM");
+  const [slots, setSlots] = useState([
+    { dayOfWeek: "Monday", startTime: "09:00 AM", endTime: "04:00 PM" },
+    { dayOfWeek: "Tuesday", startTime: "09:00 AM", endTime: "04:00 PM" },
+    { dayOfWeek: "Wednesday", startTime: "09:00 AM", endTime: "04:00 PM" },
+    { dayOfWeek: "Thursday", startTime: "09:00 AM", endTime: "04:00 PM" },
+  ]);
 
-  const [isUpdating, setIsUpdating] = useState(false);
+  const handleTimechange;
 
-  // Add working hours handler
   const handleWorkingHoursChange = (
     day: string,
     field: "start" | "end" | "isWorking",
     value: string | boolean
   ) => {
-    setWorkingHours((prev) => ({
-      ...prev,
-      [day]: { ...prev[day], [field]: value },
-    }));
+    setSlots((prevSlots) =>
+      prevSlots.map((slot) =>
+        slot.dayOfWeek === day ? { ...slot, [field]: value } : slot
+      )
+    );
   };
-
   const handlePasswordUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -571,36 +569,30 @@ const DoctorSettings = () => {
               </div>
             </div>
             <div className="space-y-4">
-              {Object.entries(workingHours).map(([day, hours]) => (
-                <div key={day} className="flex items-center gap-4 form-label">
-                  <div className="w-24 capitalize">{day}</div>
-                  <ToggleSwitch
-                    checked={hours.isWorking}
-                    onChange={(checked) =>
-                      handleWorkingHoursChange(day, "isWorking", checked)
-                    }
-                  />
-                  {hours.isWorking && (
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="time"
-                        value={hours.start}
-                        onChange={(e) =>
-                          handleWorkingHoursChange(day, "start", e.target.value)
-                        }
-                        className="form-input w-32"
-                      />
-                      <span>to</span>
-                      <input
-                        type="time"
-                        value={hours.end}
-                        onChange={(e) =>
-                          handleWorkingHoursChange(day, "end", e.target.value)
-                        }
-                        className="form-input w-32"
-                      />
-                    </div>
-                  )}
+              {slots.map((slot, index) => (
+                <div className="" key={index}>
+                  <label htmlFor="" className="form-label">
+                    {slot.dayOfWeek}
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="time"
+                      value={slot.startTime}
+                      onChange={(e) =>
+                        handleTimeChange(index, "startTime", e.target.value)
+                      }
+                      className="form-input"
+                    />
+                    <span className="text-gray-500">to</span>
+                    <input
+                      type="time"
+                      value={slot.endTime}
+                      onChange={(e) =>
+                        handleTimeChange(index, "endTime", e.target.value)
+                      }
+                      className="form-input"
+                    />
+                  </div>
                 </div>
               ))}
             </div>

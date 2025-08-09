@@ -7,6 +7,7 @@ import AuthRoutes from "./routes/Authroutes.js";
 import AdminRoutes from "./routes/AdminRoutes.js";
 import UserRoutes from "./routes/UserRoutes.js";
 import UploadRoutes from "./routes/UploadRoutes.js";
+import DoctorRoutes from "./routes/DoctorRoutes.js";
 
 dotenv.config();
 
@@ -41,3 +42,4 @@ app.use("/api/admin", AdminRoutes);
 app.use("/api/auth", AuthRoutes);
 app.use("/api/user", UserRoutes);
 app.use("/api/upload", UploadRoutes);
+app.use("/api", DoctorRoutes);
