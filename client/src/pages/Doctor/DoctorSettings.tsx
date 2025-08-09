@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../context/AuthProvider";
 import LoadSpinner from "../../components/LoadSpinner";
 import { toast } from "react-hot-toast";
@@ -180,25 +180,69 @@ const DoctorSettings = () => {
   //Working slots
   const [startTime, setStartTime] = useState("09:00 AM");
   const [endTime, setEndTime] = useState("04:00 PM");
-  const [slots, setSlots] = useState([
-    { dayOfWeek: "Monday", startTime: "09:00 AM", endTime: "04:00 PM" },
-    { dayOfWeek: "Tuesday", startTime: "09:00 AM", endTime: "04:00 PM" },
-    { dayOfWeek: "Wednesday", startTime: "09:00 AM", endTime: "04:00 PM" },
-    { dayOfWeek: "Thursday", startTime: "09:00 AM", endTime: "04:00 PM" },
-  ]);
+  //fetch existing slots
+  useEffect(() => {
+    const fetchSlots = async () => {
+      const res = await fetch(`${API_URL}/api/doctor/availability`, {
+        method: "GET",
+        credentials: "include",
+      });
+      if (!res.ok) {
+        throw new Error("Failed to fetch working hours");
+      }
+      const data = await res.json();
+      if (data && data.slots) {
+        setSlots(data.slots);
+      }
+    };
+    fetchSlots();
+  }, []);
+  const defaultSlots = [
+    { dayOfWeek: "Monday", startTime: "09:00", endTime: "16:00" },
+    { dayOfWeek: "Tuesday", startTime: "09:00", endTime: "16:00" },
+    { dayOfWeek: "Wednesday", startTime: "09:00", endTime: "16:00" },
+    { dayOfWeek: "Thursday", startTime: "09:00", endTime: "16:00" },
+    { dayOfWeek: "Friday", startTime: "09:00", endTime: "16:00" },
+    { dayOfWeek: "Saturday", startTime: "09:00", endTime: "13:00" },
+    { dayOfWeek: "Sunday", startTime: "09:00", endTime: "13:00" },
+  ];
+  const [slots, setSlots] = useState(slots || defaultSlots);
 
-  const handleTimechange;
-
-  const handleWorkingHoursChange = (
-    day: string,
-    field: "start" | "end" | "isWorking",
-    value: string | boolean
+  const handleTimeChange = (
+    index: number,
+    field: "startTime" | "endTime",
+    value: string
   ) => {
     setSlots((prevSlots) =>
-      prevSlots.map((slot) =>
-        slot.dayOfWeek === day ? { ...slot, [field]: value } : slot
+      prevSlots.map((slot, i) =>
+        i === index ? { ...slot, [field]: value } : slot
       )
     );
+  };
+
+  const handleSlotsUpdate = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    try {
+      const res = await fetch(`${API_URL}/api/doctor/working-hours`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(slots),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.message || "Failed to update working hours");
+      }
+      toast.success(data.message || "Working hours updated successfully");
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message || "Failed to update working hours"
+          : "Failed to update working hours"
+      );
+    }
   };
   const handlePasswordUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -214,7 +258,7 @@ const DoctorSettings = () => {
           newPassword,
         }),
       });
-      const data = await res.json(); // Get backend message
+      const data = await res.json();
       if (!res.ok) {
         throw new Error(data.message || "Failed to update password");
       }
@@ -568,34 +612,43 @@ const DoctorSettings = () => {
                 <h2 className="text-xl font-semibold">Working Hours</h2>
               </div>
             </div>
-            <div className="space-y-4">
-              {slots.map((slot, index) => (
-                <div className="" key={index}>
-                  <label htmlFor="" className="form-label">
-                    {slot.dayOfWeek}
-                  </label>
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="time"
-                      value={slot.startTime}
-                      onChange={(e) =>
-                        handleTimeChange(index, "startTime", e.target.value)
-                      }
-                      className="form-input"
-                    />
-                    <span className="text-gray-500">to</span>
-                    <input
-                      type="time"
-                      value={slot.endTime}
-                      onChange={(e) =>
-                        handleTimeChange(index, "endTime", e.target.value)
-                      }
-                      className="form-input"
-                    />
+            <form action="submit" onSubmit={handleSlotsUpdate}>
+              <div className="space-y-4">
+                {slots.map((slot, index) => (
+                  <div className="" key={index}>
+                    <label htmlFor="" className="form-label">
+                      {slot.dayOfWeek}
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="time"
+                        value={slot.startTime}
+                        onChange={(e) =>
+                          handleTimeChange(index, "startTime", e.target.value)
+                        }
+                        className="form-input"
+                      />
+                      <span className="text-gray-500">to</span>
+                      <input
+                        type="time"
+                        value={slot.endTime}
+                        onChange={(e) =>
+                          handleTimeChange(index, "endTime", e.target.value)
+                        }
+                        className="form-input"
+                      />
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+              <button
+                type="submit"
+                className="button-primary mt-4 w-full"
+                onClick={() => toast.success("Working hours updated!")}
+              >
+                Update Working Hours
+              </button>
+            </form>
           </div>
         </div>
       </section>

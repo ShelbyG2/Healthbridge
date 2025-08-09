@@ -32,4 +32,19 @@ router.post("/doctor/availability", protect, async (req, res) => {
   }
 });
 
+//get alll slots
+router.get("/doctor/availability", protect, async (req, res) => {
+  try {
+    const doctorId = req.user.id;
+    const slots = await DoctorAvailability.find({ doctorId });
+    if (slots) {
+      res.status(200).json({ slots });
+    }
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: error.message || "internal server error 🚫" });
+    console.log(error);
+  }
+});
 export default router;
