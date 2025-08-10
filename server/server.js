@@ -19,7 +19,8 @@ app.use(
   cors({
     origin: [
       "http://192.168.100.2:5173", // laptop frontend
-      "http://localhost:5173", // local frontend
+        "http://localhost:5173", // local frontend
+        "http://192.168.100.14:5173", // dev host frontend
     ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],

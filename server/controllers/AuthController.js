@@ -52,12 +52,12 @@ export const logIn = async (req, res) => {
     await user.save();
 
     const token = generateToken(user);
+    const isProduction = process.env.NODE_ENV === "production";
     res.cookie("token", token, {
       httpOnly: true,
-      secure: true, // Required for HTTPS
-      sameSite: "none", // Required for cross-origin
+      secure: isProduction, // HTTPS only in production
+      sameSite: isProduction ? "none" : "lax", // allow cross-origin in prod, dev can be lax over HTTP
       maxAge: 24 * 60 * 60 * 1000, // 24 hours
-      // domain: ".onrender.com",
     });
     res.status(200).json({
       message: "Logged in succesfully",
