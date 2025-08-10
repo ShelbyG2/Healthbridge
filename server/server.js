@@ -8,6 +8,7 @@ import AdminRoutes from "./routes/AdminRoutes.js";
 import UserRoutes from "./routes/UserRoutes.js";
 import UploadRoutes from "./routes/UploadRoutes.js";
 import DoctorRoutes from "./routes/DoctorRoutes.js";
+import PatientRoutes from "./routes/PatientRoutes.js";
 
 dotenv.config();
 
@@ -17,9 +18,8 @@ app.use(cookieParser());
 app.use(
   cors({
     origin: [
-      "http://192.168.100.2:5173", // Your laptop IP
-      "http://localhost:5173",
-      "https://healthbridge-client.onrender.com",
+      "http://192.168.100.2:5173", // laptop frontend
+      "http://localhost:5173", // local frontend
     ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
@@ -43,3 +43,4 @@ app.use("/api/auth", AuthRoutes);
 app.use("/api/user", UserRoutes);
 app.use("/api/upload", UploadRoutes);
 app.use("/api", DoctorRoutes);
+app.use("/api", PatientRoutes);

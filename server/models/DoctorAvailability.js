@@ -12,15 +12,6 @@ const slotSchema = new mongoose.Schema({
       "Saturday",
       "Sunday",
     ],
-    default: [
-      "Monday",
-      "Tuesday",
-      "Wednesday",
-      "Thursday",
-      "Friday",
-      "Saturday",
-      "Sunday",
-    ],
     required: true,
   },
 

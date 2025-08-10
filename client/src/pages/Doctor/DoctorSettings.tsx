@@ -188,15 +188,24 @@ const DoctorSettings = () => {
         credentials: "include",
       });
       if (!res.ok) {
-        throw new Error("Failed to fetch working hours");
+        setSlots(defaultSlots);
       }
       const data = await res.json();
       if (data && data.slots) {
-        setSlots(data.slots);
+        setSlots(mergeSlotsWithDefaults(data.slots, defaultSlots));
       }
     };
     fetchSlots();
   }, []);
+  //merge slots and default slots
+  const mergeSlotsWithDefaults = (backendSlots, defaultSlots) => {
+    return defaultSlots.map((defaultSlot) => {
+      const found = backendSlots.find(
+        (s) => s.dayOfWeek === defaultSlot.dayOfWeek
+      );
+      return found ? { ...defaultSlot, ...found } : { ...defaultSlot };
+    });
+  };
   const defaultSlots = [
     { dayOfWeek: "Monday", startTime: "09:00", endTime: "16:00" },
     { dayOfWeek: "Tuesday", startTime: "09:00", endTime: "16:00" },
@@ -206,7 +215,7 @@ const DoctorSettings = () => {
     { dayOfWeek: "Saturday", startTime: "09:00", endTime: "13:00" },
     { dayOfWeek: "Sunday", startTime: "09:00", endTime: "13:00" },
   ];
-  const [slots, setSlots] = useState(slots || defaultSlots);
+  const [slots, setSlots] = useState(defaultSlots);
 
   const handleTimeChange = (
     index: number,
@@ -223,23 +232,23 @@ const DoctorSettings = () => {
   const handleSlotsUpdate = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      const res = await fetch(`${API_URL}/api/doctor/working-hours`, {
+      const res = await fetch(`${API_URL}/api/doctor/availability`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
         credentials: "include",
-        body: JSON.stringify(slots),
+        body: JSON.stringify({ slots }),
       });
       const data = await res.json();
       if (!res.ok) {
         throw new Error(data.message || "Failed to update working hours");
       }
-      toast.success(data.message || "Working hours updated successfully");
+      toast.success(data.message);
     } catch (error) {
       toast.error(
         error instanceof Error
-          ? error.message || "Failed to update working hours"
+          ? "Failed to update working hours"
           : "Failed to update working hours"
       );
     }
@@ -262,7 +271,7 @@ const DoctorSettings = () => {
       if (!res.ok) {
         throw new Error(data.message || "Failed to update password");
       }
-      toast.success(data.message || "Password updated successfully");
+      toast.success(data.message);
     } catch (error) {
       toast.error(
         error instanceof Error
@@ -641,11 +650,7 @@ const DoctorSettings = () => {
                   </div>
                 ))}
               </div>
-              <button
-                type="submit"
-                className="button-primary mt-4 w-full"
-                onClick={() => toast.success("Working hours updated!")}
-              >
+              <button type="submit" className="button-primary mt-4 w-full">
                 Update Working Hours
               </button>
             </form>
