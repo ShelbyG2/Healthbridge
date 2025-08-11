@@ -29,7 +29,7 @@ import {
 
 function App() {
   return (
-    <div className="App w-screen bg-light-bg dark:bg-dark-bg ">
+    <div className="max-h-screen overflow-hidden">
       <DarkModeToggle />
       <Toaster position="top-right" reverseOrder={false} />
       <Routes>

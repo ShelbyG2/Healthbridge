@@ -120,7 +120,7 @@ const PatientNavBar = () => {
               <Clock /> Med Tracker
             </li>
           </Link>
-          <Link to="/dashboard/atient/profile">
+          <Link to="/dashboard/patient/profile">
             <li className="flex items-center gap-2  bg-light-bg-highlight dark:bg-dark-bg-highlight p-2 rounded-md bg-opacity-20 hover:bg-light-hover dark:hover:bg-dark-hover">
               <Settings /> Settings
             </li>

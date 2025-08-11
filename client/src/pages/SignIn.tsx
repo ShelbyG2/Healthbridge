@@ -63,7 +63,7 @@ const SignIn = () => {
     }
   };
   return (
-    <div className="h-screen flex flex-col items-center ">
+    <div className="h-screen flex flex-col items-center overflow-hidden ">
       <div
         className="absolute inset-0 z-0 bg-light-bg-shape1 dark:bg-dark-bg-shape1 [clip-path:polygon(0_0,100%_0,0_100%)] 
         animate-slide-in-left"

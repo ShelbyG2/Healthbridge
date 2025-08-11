@@ -28,5 +28,13 @@ router.post(
     }
   }
 );
-
+router.get("/appointments/:patientId", protect, async (req, res) => {
+  const { patientId } = req.params;
+  try {
+    const appointments = await Appointment.find({ patientId });
+    res.status(200).json(appointments);
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
 export default router;

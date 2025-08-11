@@ -1,4 +1,32 @@
 import DoctorAvailability from "../models/DoctorAvailability.js";
+import { User } from "../models/User.js";
+
+export const getaAllDoctors = async (req, res) => {
+  try {
+    const doctors = await User.find({ role: "doctor" }).select(
+      "-password -__v"
+    );
+    res.status(200).json(doctors);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: error.message || "internal server error 🚫" });
+  }
+};
+export const getDoctorById = async (req, res) => {
+  try {
+    const { doctorId } = req.params;
+    const doctor = await User.findById(doctorId).select("-password -__v");
+    if (!doctor) {
+      return res.status(404).json({ message: "Doctor not found" });
+    }
+    res.status(200).json(doctor);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: error.message || "internal server error 🚫" });
+  }
+};
 export const postAvailability = async (req, res) => {
   try {
     const doctorId = req.user.id;

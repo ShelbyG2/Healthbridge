@@ -9,8 +9,8 @@ export const doctorAvailability = async (req, res, next) => {
       return res.status(400).json({
         message: "Slot is already booked for this doctor on this date",
       });
-      next();
     }
+    next();
   } catch (error) {
     return res.status(500).json({
       message: "Internal server error",

@@ -126,7 +126,6 @@ const DoctorSettings = () => {
   // Update profile handler with image upload
   const handleProfileUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsUpdating(true);
 
     try {
       const res = await fetch(`${API_URL}/api/user/profile`, {
@@ -156,8 +155,6 @@ const DoctorSettings = () => {
           ? error.message || "Failed to update profile"
           : "Failed to update profile"
       );
-    } finally {
-      setIsUpdating(false);
     }
   };
 
