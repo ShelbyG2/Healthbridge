@@ -7,18 +7,34 @@ import { API_URL } from "../../lib/utils";
 
 const PatientSettings = () => {
   const { user, loading } = useContext(AuthContext);
+
+  const [fullname, setFullname] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [address, setAddress] = useState("");
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [emailNotifications, setEmailNotifications] = useState(false);
+  const [smsNotifications, setSmsNotifications] = useState(false);
+
+  const handleEmailNotificationsChange = (checked: boolean) => {
+    setEmailNotifications(checked);
+  };
+
+  const handleSmsNotificationsChange = (checked: boolean) => {
+    setSmsNotifications(checked);
+  };
+
   if (loading) {
     return <LoadSpinner />;
   }
   if (!user) {
-    return toast.error("Failed to load user data");
+    toast.error("Failed to load user data");
+    return null;
   }
-  const [fullname, setFullname] = useState(user.fullname || "");
-  const [email, setEmail] = useState(user.email || "");
-  const [phone, setPhone] = useState(user.phone || "");
-  const [address, setAddress] = useState(user.address || "");
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
+
+  // Set initial values from user after loading
+  // (Optional: You may want to use useEffect to update state when user changes)
 
   const handleFullnameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFullname(e.target.value);
@@ -284,11 +300,17 @@ const PatientSettings = () => {
                 </label>
                 <div className="flex items-center space-x-4">
                   <span className="form-label">Email Notifications</span>
-                  <ToggleSwitch />
+                  <ToggleSwitch
+                    checked={emailNotifications}
+                    onChange={handleEmailNotificationsChange}
+                  />
                 </div>
                 <div className="flex items-center space-x-4 mt-2">
                   <span className="form-label">SMS Notifications</span>
-                  <ToggleSwitch />
+                  <ToggleSwitch
+                    checked={smsNotifications}
+                    onChange={handleSmsNotificationsChange}
+                  />
                 </div>
               </div>
               <button className="button-primary">Save Preferences</button>

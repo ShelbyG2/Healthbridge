@@ -1,18 +1,40 @@
-import { Calendar1, Clock, Plus } from "lucide-react";
+import { Calendar1, Clock } from "lucide-react";
 import { useState, useEffect, useContext } from "react";
 import { API_URL } from "../../lib/utils";
 import { AuthContext } from "../../context/AuthProvider";
 import toast from "react-hot-toast";
 import LoadSpinner from "../../components/LoadSpinner";
 
+type Doctor = {
+  _id: string;
+  fullname: string;
+};
+
+type Appointment = {
+  _id: string;
+  doctorId: Doctor | null;
+  date: string;
+  status: string;
+  reason: string;
+};
+
 const PatientAppointments = () => {
+  const { user } = useContext(AuthContext);
   const [filter, setFilter] = useState("All");
   const [sort, setSort] = useState("date");
-  const [appointments, setAppointments] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [status, setStatus] = useState("Pending"); // Fixed: useState syntax
-  const { user } = useContext(AuthContext);
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [availableDoctors, setAvailableDoctors] = useState([]);
+  const [date, setDate] = useState("");
+  const [time, setTime] = useState("");
+  const [status, setStatus] = useState("Pending");
+  const [reason, setReason] = useState("");
   const [isOpen, setIsOpen] = useState(false);
+  const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
+  const [isCancelOpen, setIsCancelOpen] = useState(false);
+  const [selectedAppointmentId, setSelectedAppointmentId] = useState<
+    string | null
+  >(null);
 
   useEffect(() => {
     const fetchAppointments = async () => {
@@ -40,14 +62,36 @@ const PatientAppointments = () => {
         setAppointments(data);
       } catch (error) {
         console.error("Error fetching appointments:", error);
-        toast.error("Failed to fetch Appointments. Please try again");
+        toast.error("Failed to fetch Appointments. Please try again,");
       } finally {
         setIsLoading(false);
       }
     };
+    const fetchAvailableDoctors = async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/doctors`, {
+          method: "GET",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
 
+        if (!res.ok) {
+          const errorData = await res.json();
+          throw new Error(errorData.message || "Failed to fetch doctors");
+        }
+
+        const data = await res.json();
+        setAvailableDoctors(data);
+      } catch (error) {
+        console.error("Error fetching doctors:", error);
+        toast.error("Failed to fetch doctors. Please try again");
+      }
+    };
     fetchAppointments();
-  }, [user?._id]); // Add dependency
+    fetchAvailableDoctors();
+  }, [user?._id]);
 
   if (isLoading) {
     return <LoadSpinner />;
@@ -57,15 +101,89 @@ const PatientAppointments = () => {
     setIsOpen(true);
   };
 
-  const handleBooking = (e: React.FormEvent) => {
+  const handleBooking = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle booking logic here
+    try {
+      if (!selectedDoctor?._id || !date || !time || !reason) {
+        toast.error("All fields are required.");
+        return;
+      }
+      const localDateTime = new Date(`${date}T${time}`);
+      const utcDateTime = localDateTime.toISOString();
+      const res = await fetch(`${API_URL}/api/appointment/book`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          doctorId: selectedDoctor._id,
+          date: utcDateTime,
+          status,
+          reason,
+        }),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Failed to book appointment");
+      }
+
+      const data = await res.json();
+      setAppointments((prev) => [...prev, data]);
+      toast.success("Appointment booked successfully");
+      setIsOpen(false);
+      window.location.reload();
+    } catch (error) {
+      console.error("Error booking appointment:", error);
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Failed to book appointment. Please try again"
+      );
+    }
   };
 
-  const handleCancelAppointment = (appointmentId: string) => {
-    setStatus(appointmentId.at(0) === "1" ? "Cancelled" : "Pending");
-  };
+  const handleCancelAppointment = async (appointmentId: string) => {
+    try {
+      const res = await fetch(`${API_URL}/api/appointment/${appointmentId}`, {
+        method: "PUT",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          status: "Cancelled",
+        }),
+      });
 
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Failed to cancel appointment");
+      }
+      const data = await res.json();
+      setAppointments((prev) =>
+        prev.map((appointment) =>
+          appointment._id === data._id
+            ? { ...appointment, ...data }
+            : appointment
+        )
+      );
+
+      toast.success("Appointment cancelled successfully");
+      setIsCancelOpen(false);
+      window.location.reload();
+    } catch (error) {
+      console.error("Error updating appointment:", error);
+      toast.error("Failed to update appointment. Please try again");
+    }
+  };
+  const handleConfirmCancellation = (appointmentId: string | null) => {
+    if (appointmentId) {
+      handleCancelAppointment(appointmentId);
+    }
+    setIsCancelOpen(false);
+  };
   const filteredAppointments =
     filter === "All"
       ? appointments
@@ -79,8 +197,8 @@ const PatientAppointments = () => {
   });
 
   return (
-    <div className="flex-1 p-4 md:p-6 w-full flex flex-col min-h-screen bg-light-bg dark:bg-dark-bg">
-      <header className="mb-8 pl-8">
+    <div className="flex-1  p-4 md:p-6 w-full flex flex-col min-h-screen bg-light-bg dark:bg-dark-bg">
+      <header className="mb-8 ">
         <h1 className="text-2xl lg:text-3xl text-light-text dark:text-dark-text font-bold">
           Your Appointments
         </h1>
@@ -93,22 +211,24 @@ const PatientAppointments = () => {
       </header>
 
       {/* Filter Navigation */}
-      <nav className="flex gap-4 mb-4">
-        {["All", "Pending", "Confirmed", "Cancelled", "Completed"].map(
-          (status) => (
-            <button
-              key={status}
-              onClick={() => setFilter(status)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium ${
-                filter === status
-                  ? "bg-blue-500 text-white"
-                  : "bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-300"
-              }`}
-            >
-              {status}
-            </button>
-          )
-        )}
+      <nav className=" mb-4 overflow-y-hidden overflow-x-auto ">
+        <div className="flex gap-4  p-6">
+          {["All", "Pending", "Confirmed", "Cancelled", "Completed"].map(
+            (status) => (
+              <button
+                key={status}
+                onClick={() => setFilter(status)}
+                className={`px-4 py-2 rounded-lg text-sm font-medium ${
+                  filter === status
+                    ? "bg-blue-500 text-white"
+                    : "bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-300"
+                }`}
+              >
+                {status}
+              </button>
+            )
+          )}
+        </div>
       </nav>
 
       {/* Sorter */}
@@ -127,7 +247,7 @@ const PatientAppointments = () => {
       </div> */}
 
       {/* List of Appointments */}
-      <section className="h-full w-full overflow-y-auto bg-light-surface dark:bg-dark-surface dark:text-dark-secondary p-6 rounded-lg">
+      <section className="h-full pb-20 w-full overflow-y-auto bg-light-surface dark:bg-dark-surface dark:text-dark-secondary p-6 rounded-lg">
         {sortedAppointments.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center gap-4">
             <p className="text-light-secondary dark:text-dark-secondary">
@@ -148,7 +268,8 @@ const PatientAppointments = () => {
                 className="flex flex-col p-4 border border-light-border dark:border-dark-border rounded-lg"
               >
                 <h2 className="text-lg text-light-text dark:text-dark-text font-semibold">
-                  Appointment with Dr. {appointment.doctorId}
+                  Appointment with Dr.{" "}
+                  {appointment.doctorId?.fullname ?? "Unknown Doctor"}
                 </h2>
                 <p className="text-gray-600 dark:text-gray-400">
                   <Calendar1 className="inline-block mr-1" /> Date:{" "}
@@ -186,7 +307,10 @@ const PatientAppointments = () => {
                   <div className="flex justify-end">
                     <button
                       className="button-danger"
-                      onClick={() => handleCancelAppointment(appointment._id)}
+                      onClick={() => {
+                        setIsCancelOpen(true);
+                        setSelectedAppointmentId(appointment._id);
+                      }}
                     >
                       Cancel
                     </button>
@@ -197,6 +321,33 @@ const PatientAppointments = () => {
           </ul>
         )}
       </section>
+      {/* Modal to confirm Appointment cancellation */}
+      {isCancelOpen && (
+        <div className="fixed inset-0 flex items-center h-screen w-screen bg-light-bg/60 dark:bg-dark-bg/60 justify-center z-50">
+          <div className="bg-light-bg dark:bg-dark-bg rounded-lg shadow-lg p-6 max-w-md w-full">
+            <h2 className="text-lg font-bold text-light-text dark:text-dark-text">
+              Confirm Cancellation
+            </h2>
+            <p className="text-light-secondary dark:text-dark-secondary">
+              Are you sure you want to cancel this appointment?
+            </p>
+            <div className="flex justify-end mt-4">
+              <button
+                className="button-danger"
+                onClick={() => handleConfirmCancellation(selectedAppointmentId)}
+              >
+                Confirm
+              </button>
+              <button
+                className="button-secondary ml-2"
+                onClick={() => setIsCancelOpen(false)}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Appointment booking modal */}
       {isOpen && (
         <div className="fixed inset-0 flex items-center h-screen w-screen bg-light-bg/60 dark:bg-dark-bg/60 justify-center z-50">
@@ -207,28 +358,60 @@ const PatientAppointments = () => {
                 <label htmlFor="doctor" className="form-label">
                   Select Doctor
                 </label>
-                <select id="doctor" className="form-input">
-                  <option value="doctor1">Dr. Smith</option>
-                  <option value="doctor2">Dr. Johnson</option>
+                <select
+                  id="doctor"
+                  className="form-input"
+                  value={selectedDoctor?._id || ""}
+                  onChange={(e) => {
+                    const selected = availableDoctors.find(
+                      (d) => d._id === e.target.value
+                    );
+                    setSelectedDoctor(selected || null);
+                  }}
+                >
+                  <option value="">Select a doctor</option>
+                  {availableDoctors.map((doctor) => (
+                    <option key={doctor._id} value={doctor._id}>
+                      Dr. {doctor.fullname}
+                    </option>
+                  ))}
                 </select>
               </div>
               <div className="mb-4">
                 <label htmlFor="date" className="form-label">
                   Select Date
                 </label>
-                <input type="date" id="date" className="form-input" />
+                <input
+                  type="date"
+                  id="date"
+                  className="form-input"
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
+                />
               </div>
               <div className="mb-4">
                 <label htmlFor="time" className="form-label">
                   Select Time
                 </label>
-                <input type="time" id="time" className="form-input" />
+                <input
+                  type="time"
+                  id="time"
+                  className="form-input"
+                  value={time}
+                  onChange={(e) => setTime(e.target.value)}
+                />
               </div>
               <div className="mb-4">
                 <label htmlFor="reason" className="form-label">
                   Reason for Appointment
                 </label>
-                <textarea id="reason" className="form-input" rows={3} />
+                <textarea
+                  id="reason"
+                  className="form-input"
+                  rows={3}
+                  value={reason}
+                  onChange={(e) => setReason(e.target.value)}
+                />
               </div>
               <div className="flex justify-between mt-4">
                 <button className="button-primary " type="submit">

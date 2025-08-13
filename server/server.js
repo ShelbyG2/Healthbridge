@@ -9,6 +9,7 @@ import UserRoutes from "./routes/UserRoutes.js";
 import UploadRoutes from "./routes/UploadRoutes.js";
 import DoctorRoutes from "./routes/DoctorRoutes.js";
 import PatientRoutes from "./routes/PatientRoutes.js";
+import TriageRoutes from "./routes/AiTriageRoutes.js";
 
 dotenv.config();
 
@@ -46,3 +47,4 @@ app.use("/api/user", UserRoutes);
 app.use("/api/upload", UploadRoutes);
 app.use("/api", DoctorRoutes);
 app.use("/api", PatientRoutes);
+app.use("/api", TriageRoutes);
