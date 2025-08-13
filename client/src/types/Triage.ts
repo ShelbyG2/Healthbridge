@@ -1,5 +1,3 @@
-import { Types } from "mongoose";
-
 interface Symptoms {
   description: string;
   duration: string;
@@ -36,8 +34,8 @@ interface TriageResult {
 }
 
 interface Triage {
-  _id: Types.ObjectId;
-  patientId: Types.ObjectId;
+  _id: string;
+  patientId: string;
   symptoms: Symptoms;
   additionalInfo: AdditionalInfo;
   triageResult: TriageResult;
