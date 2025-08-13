@@ -172,5 +172,23 @@ Immediate Advice if NOT NEAR healthcare:
     console.error(error);
   }
 });
+router.get("/patient/:patientId/triage", protect, async (req, res) => {
+  try {
+    const { patientId } = req.params;
+    if (!patientId) {
+      res
+        .status(400)
+        .json({ message: "Invalid patientId Please login and try again" });
+    }
+    const triageResults = await Triage.find({ patientId });
+    if (!triageResults) {
+      res.sendStatus(400).json({ message: "No results found" });
+    }
+    res.status(200).json(triageResults);
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error!" });
+    console.error(error);
+  }
+});
 
 export default router;
