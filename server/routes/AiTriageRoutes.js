@@ -182,20 +182,4 @@ router.get("/patient/:patientId/triage", protect, async (req, res) => {
   }
 });
 
-// Test code
-const testResponse = `Possible Conditions:
-- Hypertensive Urgency/Emergency (confidence: high)
-- Migraine with Aura (confidence: high)
-- Other Secondary Headache (e.g., related to increased intracranial pressure) (confidence: medium)
-
-Urgency Level: high
-
-Recommended Specialist: neurologist
-
-Immediate Advice if NEAR healthcare: Proceed immediately to the nearest emergency department...
-
-Immediate Advice if NOT NEAR healthcare: Call emergency services...`;
-
-console.log(parseAIResponse(testResponse));
-
 export default router;

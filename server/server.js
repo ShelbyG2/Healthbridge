@@ -18,12 +18,15 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: [
-      "http://10.0.2.2:5173", // android emulator frontend
-      "http://192.168.100.2:5173", // laptop frontend
-      "http://localhost:5173", // local frontend
-      "http://192.168.100.14:5173", // dev host frontend
-    ],
+    origin:
+      process.env.NODE_ENV === "production"
+        ? process.env.CLIENT_URL
+        : [
+            "http://10.0.2.2:5173",
+            "http://192.168.100.2:5173",
+            "http://localhost:5173",
+            "http://192.168.100.14:5173",
+          ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
