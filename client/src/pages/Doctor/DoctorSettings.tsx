@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useMemo } from "react";
 import { AuthContext } from "../../context/AuthProvider";
 import LoadSpinner from "../../components/LoadSpinner";
 import { toast } from "react-hot-toast";
@@ -14,30 +14,113 @@ import {
   Clock,
   BookmarkPlus,
 } from "lucide-react";
+import Error401 from "../Error401";
+
+interface Slot {
+  dayOfWeek: string;
+  startTime: string;
+  endTime: string;
+}
 
 const DoctorSettings = () => {
   const { user, loading } = useContext(AuthContext);
+
+  // profile information (initialize with empty/default values)
+  const [fullname, setFullname] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [address, setAddress] = useState("");
+  const [gender, setGender] = useState("");
+  const [dateOfBirth, setDateOfBirth] = useState("");
+  // const [profileImage, setProfileImage] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string>("default-avatar.png");
+  const [uploadProgress, setUploadProgress] = useState<number>(0);
+  const [uploadedImageUrl, setUploadedImageUrl] = useState<string>("");
+
+  // professional information
+  const [specialization, setSpecialization] = useState("");
+  const [licenseNumber, setLicenseNumber] = useState("");
+  const [experience, setExperience] = useState("");
+  const [education, setEducation] = useState("");
+
+  const [availability, setAvailability] = useState(false);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+
+  //Security settings
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+
+  //Working slots
+
+  const defaultSlots = useMemo(
+    () => [
+      { dayOfWeek: "Monday", startTime: "09:00", endTime: "16:00" },
+      { dayOfWeek: "Tuesday", startTime: "09:00", endTime: "16:00" },
+      { dayOfWeek: "Wednesday", startTime: "09:00", endTime: "16:00" },
+      { dayOfWeek: "Thursday", startTime: "09:00", endTime: "16:00" },
+      { dayOfWeek: "Friday", startTime: "09:00", endTime: "16:00" },
+      { dayOfWeek: "Saturday", startTime: "09:00", endTime: "13:00" },
+      { dayOfWeek: "Sunday", startTime: "09:00", endTime: "13:00" },
+    ],
+    []
+  );
+  const [slots, setSlots] = useState(defaultSlots);
+  // const [startTime, setStartTime] = useState("09:00 AM");
+  // const [endTime, setEndTime] = useState("04:00 PM");
+
+  useEffect(() => {
+    if (user?.role === "doctor") {
+      setFullname(user.fullname || "");
+      setEmail(user.email || "");
+      setPhone(user.phone || "");
+      setAddress(user.address || "");
+      setGender(user.gender || "");
+      setDateOfBirth(user.dateOfBirth || "");
+      setPreviewUrl(user.profileImage || "default-avatar.png");
+      setUploadedImageUrl(user.profileImage || "");
+      setSpecialization(user.specialization || "");
+      setLicenseNumber(user.licenseNumber || "");
+      setExperience(
+        user.experience !== undefined && user.experience !== null
+          ? String(user.experience)
+          : ""
+      );
+      setEducation(user.education || "");
+      setAvailability(user.availability || false);
+    }
+  }, [user]);
+  useEffect(() => {
+    const fetchSlots = async () => {
+      const res = await fetch(`${API_URL}/api/doctor/availability`, {
+        method: "GET",
+        credentials: "include",
+      });
+      if (!res.ok) {
+        setSlots(defaultSlots);
+      }
+      const data = await res.json();
+      if (data && data.slots) {
+        setSlots(mergeSlotsWithDefaults(data.slots, defaultSlots));
+      }
+    };
+    fetchSlots();
+  }, [defaultSlots]);
+
+  // Move all hooks above any conditional return
+  // Conditional returns below
+
+  if (user?.role !== "doctor") {
+    return <Error401 />;
+  }
+
   if (loading) {
     return <LoadSpinner />;
   }
+
   if (!user) {
-    return toast.error("Failed to load user data");
+    toast.error("Failed to load user data");
+    return null;
   }
-  // profile information
-  const [fullname, setFullname] = useState(user.fullname || "");
-  const [email, setEmail] = useState(user.email || "");
-  const [phone, setPhone] = useState(user.phone || "");
-  const [address, setAddress] = useState(user.address || "");
-  const [gender, setGender] = useState(user.gender || "");
-  const [dateOfBirth, setDateOfBirth] = useState(user.dateOfBirth || "");
-  const [profileImage, setProfileImage] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string>(
-    user.profileImage || "default-avatar.png"
-  );
-  const [uploadProgress, setUploadProgress] = useState<number>(0);
-  const [uploadedImageUrl, setUploadedImageUrl] = useState<string>(
-    user.profileImage || ""
-  );
 
   const formatDate = (dateString: string) => {
     if (!dateString) return "";
@@ -54,9 +137,9 @@ const DoctorSettings = () => {
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
   };
-  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPhone(e.target.value);
-  };
+  // const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   setPhone(e.target.value);
+  // };
   const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setAddress(e.target.value);
   };
@@ -158,44 +241,12 @@ const DoctorSettings = () => {
     }
   };
 
-  // professional information
-  const [specialization, setSpecialization] = useState(
-    user.specialization || ""
-  );
-  const [licenseNumber, setLicenseNumber] = useState(user.licenseNumber || "");
-  const [experience, setExperience] = useState(user.experience || "");
-  const [education, setEducation] = useState(user.education || "");
-
-  // Availability & notifications
-  const [availability, setAvailability] = useState(user.availability || false);
-  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
-
-  //Security settings
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-
-  //Working slots
-  const [startTime, setStartTime] = useState("09:00 AM");
-  const [endTime, setEndTime] = useState("04:00 PM");
-  //fetch existing slots
-  useEffect(() => {
-    const fetchSlots = async () => {
-      const res = await fetch(`${API_URL}/api/doctor/availability`, {
-        method: "GET",
-        credentials: "include",
-      });
-      if (!res.ok) {
-        setSlots(defaultSlots);
-      }
-      const data = await res.json();
-      if (data && data.slots) {
-        setSlots(mergeSlotsWithDefaults(data.slots, defaultSlots));
-      }
-    };
-    fetchSlots();
-  }, []);
   //merge slots and default slots
-  const mergeSlotsWithDefaults = (backendSlots, defaultSlots) => {
+
+  const mergeSlotsWithDefaults = (
+    backendSlots: Slot[],
+    defaultSlots: Slot[]
+  ): Slot[] => {
     return defaultSlots.map((defaultSlot) => {
       const found = backendSlots.find(
         (s) => s.dayOfWeek === defaultSlot.dayOfWeek
@@ -203,16 +254,6 @@ const DoctorSettings = () => {
       return found ? { ...defaultSlot, ...found } : { ...defaultSlot };
     });
   };
-  const defaultSlots = [
-    { dayOfWeek: "Monday", startTime: "09:00", endTime: "16:00" },
-    { dayOfWeek: "Tuesday", startTime: "09:00", endTime: "16:00" },
-    { dayOfWeek: "Wednesday", startTime: "09:00", endTime: "16:00" },
-    { dayOfWeek: "Thursday", startTime: "09:00", endTime: "16:00" },
-    { dayOfWeek: "Friday", startTime: "09:00", endTime: "16:00" },
-    { dayOfWeek: "Saturday", startTime: "09:00", endTime: "13:00" },
-    { dayOfWeek: "Sunday", startTime: "09:00", endTime: "13:00" },
-  ];
-  const [slots, setSlots] = useState(defaultSlots);
 
   const handleTimeChange = (
     index: number,

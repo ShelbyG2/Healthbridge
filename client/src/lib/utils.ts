@@ -1,7 +1,8 @@
 import { type ClassValue, clsx } from "clsx";
+
 import { twMerge } from "tailwind-merge";
 
-export const API_URL = "http://192.168.100.14:3000";
+export const API_URL = import.meta.env.VITE_API_URL;
 
 export const fetchConfig = {
   credentials: "include" as RequestCredentials,

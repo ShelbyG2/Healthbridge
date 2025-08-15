@@ -80,7 +80,10 @@ export const TriageForm = ({
           className="form-input"
           value={symptoms.severity}
           onChange={(e) =>
-            setSymptoms({ ...symptoms, severity: e.target.value })
+            setSymptoms({
+              ...symptoms,
+              severity: e.target.value as "mild" | "moderate" | "severe",
+            })
           }
         >
           <option value="" disabled>

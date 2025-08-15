@@ -24,7 +24,7 @@ const PatientAppointments = () => {
   const [sort, setSort] = useState("date");
   const [isLoading, setIsLoading] = useState(true);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
-  const [availableDoctors, setAvailableDoctors] = useState([]);
+  const [availableDoctors, setAvailableDoctors] = useState<Doctor[]>([]);
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
   const [status, setStatus] = useState("Pending");

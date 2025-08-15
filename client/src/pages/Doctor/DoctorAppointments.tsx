@@ -24,7 +24,7 @@ const DoctorAppointments = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const { user } = useContext(AuthContext);
-  const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
+
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [isCompleteOpen, setIsCompleteOpen] = useState(false);
   const [selectedAppointmentId, setSelectedAppointmentId] = useState<
@@ -296,7 +296,11 @@ const DoctorAppointments = () => {
             <div className="flex justify-end mt-4">
               <button
                 className="button-primary"
-                onClick={() => handleConfirmAppointment(selectedAppointmentId)}
+                onClick={() => {
+                  if (selectedAppointmentId) {
+                    handleConfirmAppointment(selectedAppointmentId);
+                  }
+                }}
               >
                 Confirm
               </button>
@@ -323,9 +327,11 @@ const DoctorAppointments = () => {
             <div className="flex justify-end mt-4">
               <button
                 className="button-primary"
-                onClick={() =>
-                  handleCompleteAppointnment(selectedAppointmentId)
-                }
+                onClick={() => {
+                  if (selectedAppointmentId) {
+                    handleCompleteAppointnment(selectedAppointmentId);
+                  }
+                }}
               >
                 Complete
               </button>
