@@ -17,6 +17,7 @@ interface AdditionalInfo {
 interface PossibleCondition {
   condition: string;
   confidenceLevel: "low" | "medium" | "high";
+  _id: string;
 }
 
 interface TriageResult {
@@ -40,8 +41,8 @@ interface Triage {
   additionalInfo: AdditionalInfo;
   triageResult: TriageResult;
   disclaimer: string;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
   __v: number;
 }
 

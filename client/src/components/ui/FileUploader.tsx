@@ -1,7 +1,11 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { UploadCloud, File, X } from "lucide-react";
 
-const FileUploader = ({ onFilesSelected }) => {
+interface FileUploaderProps {
+  onFilesSelected: (files: File[]) => void;
+}
+
+const FileUploader: React.FC<FileUploaderProps> = ({ onFilesSelected }) => {
   const [files, setFiles] = useState<File[]>([]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {

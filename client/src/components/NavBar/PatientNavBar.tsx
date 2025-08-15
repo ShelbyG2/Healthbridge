@@ -10,14 +10,13 @@ import {
   Brain,
   Clock,
 } from "lucide-react";
-import { useNavigate, Link, useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import Logo from "../../assets/logo2.png";
 import { AuthContext } from "../../context/AuthProvider";
 import { LoadSpinner } from "../LoadSpinner";
 
 const PatientNavBar = () => {
   const { logout, loading } = useContext(AuthContext);
-  const navigate = useNavigate();
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
   if (loading) {

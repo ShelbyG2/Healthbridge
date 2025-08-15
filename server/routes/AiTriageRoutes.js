@@ -9,81 +9,68 @@ const parseAIResponse = (aiResponse) => {
     // Split response into sections
     const sections = aiResponse.split("\n\n");
 
-    // Extract possible conditions
-    const conditionsSection = sections.find(
-      (s) =>
-        s.includes("possible conditions") || s.includes("Possible conditions")
-    );
-    const conditions =
-      conditionsSection
-        ?.match(/[-•]\s*(.*?)\s*\((low|medium|high)\)/gi)
-        ?.map((condition) => {
-          const [name, level] = condition.split(/\((.*?)\)/).filter(Boolean);
-          return {
-            condition: name.replace(/[-•]\s*/, "").trim(),
-            confidenceLevel: level.toLowerCase(),
-          };
-        }) || [];
-
-    // Extract urgency level
-    const urgencySection = sections.find(
-      (s) => s.includes("Urgency level") || s.includes("urgency:")
-    );
-    const urgencyLevel = (
-      urgencySection?.match(/(low|medium|high)/i)?.[0] || "low"
-    ).toLowerCase();
-
-    // Extract specialist
-    const specialistSection = sections.find(
-      (s) => s.includes("specialist") || s.includes("Recommended")
-    );
-    const specialist = (
-      specialistSection?.match(
-        /(cardiologist|dermatologist|neurologist|pediatrician|psychiatrist|other)/i
-      )?.[0] || "other"
-    ).toLowerCase();
-
-    // Extract advices
-    const adviceNearSection = sections.find((s) =>
-      s.toLowerCase().includes("advice if near healthcare")
-    );
-    const adviceNotNearSection = sections.find((s) =>
-      s.toLowerCase().includes("advice if not near healthcare")
+    // Find the conditions section using more specific matcher
+    const conditionsSection = sections.find((s) =>
+      s.toLowerCase().startsWith("possible conditions:")
     );
 
-    const adviceIfNear =
-      adviceNearSection
-        ?.replace(/Immediate Advice if NEAR healthcare:/i, "")
-        .trim() || "Please consult a healthcare provider.";
+    console.log("Found Conditions Section:", conditionsSection);
 
-    const adviceIfNotNear =
-      adviceNotNearSection
-        ?.replace(/Immediate Advice if NOT NEAR healthcare:/i, "")
-        .trim() || "Please consult a healthcare provider.";
+    // Updated regex to match the actual format
+    const conditionLines = conditionsSection?.split("\n").slice(1) || [];
+    const conditions = conditionLines
+      .map((line) => {
+        // Match pattern: "- Condition Name (confidence: level)"
+        const match = line.match(
+          /^-\s*(.*?)\s*\(confidence:\s*(low|medium|high)\)/i
+        );
+        if (!match) return null;
+
+        return {
+          condition: match[1].trim(),
+          confidenceLevel: match[2].toLowerCase(),
+        };
+      })
+      .filter(Boolean);
+
+    console.log("Parsed Conditions:", conditions);
+
+    // Extract other fields...
+    const urgencyLevel =
+      sections
+        .find((s) => s.includes("Urgency Level:"))
+        ?.split(":")[1]
+        ?.trim()
+        .toLowerCase() || "low";
+
+    const specialistSection = sections.find((s) =>
+      s.includes("Recommended Specialist:")
+    );
+    const recommendedSpecialist =
+      specialistSection?.split(":")[1]?.trim().toLowerCase() || "other";
+
+    const adviceNear =
+      sections
+        .find((s) => s.includes("Immediate Advice if NEAR"))
+        ?.split(":")[1]
+        ?.trim() || "";
+
+    const adviceNotNear =
+      sections
+        .find((s) => s.includes("Immediate Advice if NOT NEAR"))
+        ?.split(":")[1]
+        ?.trim() || "";
 
     return {
       possibleConditions: conditions,
       urgencyLevel,
-      recommendedSpecialist: specialist,
-      adviceIfNear,
-      adviceIfNotNear,
+      recommendedSpecialist,
+      adviceIfNear: adviceNear,
+      adviceIfNotNear: adviceNotNear,
     };
   } catch (error) {
-    console.error("Error parsing AI response:", error);
-    return {
-      possibleConditions: [
-        {
-          condition: "Error in analysis",
-          confidenceLevel: "low",
-        },
-      ],
-      urgencyLevel: "low",
-      recommendedSpecialist: "other",
-      adviceIfNear:
-        "Please consult a healthcare provider for proper evaluation.",
-      adviceIfNotNear:
-        "Please consult a healthcare provider for proper evaluation.",
-    };
+    console.error("Parsing Error:", error);
+    throw error;
   }
 };
 
@@ -137,7 +124,9 @@ PATIENT INFORMATION:
 RETURN YOUR ASSESSMENT IN THE FOLLOWING FORMAT (NO CODE BLOCKS, NO MARKDOWN):
 
 Possible Conditions:
-- [Condition Name] (confidence: high/medium/low)
+- Condition 1 (confidence: high)
+- Condition 2 (confidence: medium)
+- Condition 3 (confidence: low)
 
 Urgency Level: [high/medium/low]
 
@@ -180,15 +169,33 @@ router.get("/patient/:patientId/triage", protect, async (req, res) => {
         .status(400)
         .json({ message: "Invalid patientId Please login and try again" });
     }
-    const triageResults = await Triage.find({ patientId });
+    const triageResults = await Triage.findOne({ patientId }).sort({
+      updatedAt: 1,
+    });
     if (!triageResults) {
       res.sendStatus(400).json({ message: "No results found" });
     }
-    res.status(200).json(triageResults);
+    res.status(200).json({ triageResults });
   } catch (error) {
     res.status(500).json({ message: "Internal server error!" });
     console.error(error);
   }
 });
+
+// Test code
+const testResponse = `Possible Conditions:
+- Hypertensive Urgency/Emergency (confidence: high)
+- Migraine with Aura (confidence: high)
+- Other Secondary Headache (e.g., related to increased intracranial pressure) (confidence: medium)
+
+Urgency Level: high
+
+Recommended Specialist: neurologist
+
+Immediate Advice if NEAR healthcare: Proceed immediately to the nearest emergency department...
+
+Immediate Advice if NOT NEAR healthcare: Call emergency services...`;
+
+console.log(parseAIResponse(testResponse));
 
 export default router;
