@@ -1,5 +1,5 @@
-import { useContext } from "react";
-
+import { useContext, useState } from "react";
+import { PatientDashboardData } from "../../hooks/PatientDashboardData";
 import Doctor from "../../assets/doctor2.jpg";
 import { AuthContext } from "../../context/AuthProvider";
 import {
@@ -11,21 +11,62 @@ import {
   User,
   HeartPulse,
 } from "lucide-react";
+import LoadSpinner from "../../components/LoadSpinner";
+
+interface TriageResult {
+  symptoms: {
+    description: string;
+    duration: string;
+    severity: string;
+    onset: string;
+    associatedSymptoms: string[];
+  };
+  triageResult: {
+    possibleConditions: Array<{
+      condition: string;
+      confidenceLevel: string;
+      _id: string;
+    }>;
+    urgencyLevel: string;
+    recommendedSpecialist: string;
+    adviceIfNear: string;
+    adviceIfNotNear: string;
+  };
+  createdAt: string;
+  _id: string;
+}
 
 const PatientDashboard = () => {
   const { user } = useContext(AuthContext);
   const name = user?.fullname;
+  const { triages, appointments, isLoading, isError } = PatientDashboardData(
+    user?._id || ""
+  );
+  const now = new Date();
 
-  const triageResults = [
-    {
-      id: 1,
-      urgency: "High",
-      summary: "Fever - High - In Progress",
-      specialist: "General Practitioner",
-      date: "2023-10-01",
-    },
-  ];
+  const triageResults =
+    triages.length > 0
+      ? [
+          {
+            id: triages[0]._id,
+            urgency: triages[0].triageResult.urgencyLevel,
+            summary: `${triages[0].symptoms.description} - ${triages[0].symptoms.severity}`,
+            specialist: triages[0].triageResult.recommendedSpecialist,
+            date: new Date(triages[0].createdAt).toLocaleDateString(),
+            conditions: triages[0].triageResult.possibleConditions,
+          },
+        ]
+      : [];
+  const triageCount = triages.length;
+  const upcomingAppointment = appointments
+    .filter(
+      (a) =>
+        new Date(a.date) > now &&
+        ["Confirmed", "Pending", "Updated"].includes(a.status)
+    )
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())[0];
 
+  console.log(appointments);
   const messages = [
     { id: 1, text: "Your test results are ready for review", time: "3:12 PM" },
     { id: 2, text: "Your prescription has been refilled", time: "2:45 PM" },
@@ -46,6 +87,23 @@ const PatientDashboard = () => {
     },
     { id: 10, text: "Your health profile has been updated", time: "7:30 AM" },
   ];
+
+  // Update loading check
+  if (isLoading) {
+    return (
+      <div className="flex-1 flex items-center justify-center">
+        <LoadSpinner />
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="flex-1 flex items-center justify-center text-light-error dark:text-dark-error">
+        Error loading dashboard data
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1 p-6 w-full flex flex-col overflow-hidden">
@@ -88,6 +146,14 @@ const PatientDashboard = () => {
                 86%
               </p>
             </div>
+            <div className="bg-white dark:bg-dark-surface p-4 rounded-lg shadow-md border-l-4 border-light-logo-blue dark:border-dark-logo-blue transition-transform duration-300 hover:scale-105">
+              <h3 className="text-lg font-medium text-light-text dark:text-dark-text">
+                Taken Triages
+              </h3>
+              <p className="text-3xl font-bold text-light-logo-blue dark:text-dark-logo-blue">
+                {triageCount}/3
+              </p>
+            </div>
           </div>
         </div>
         {/* appointment card */}
@@ -99,22 +165,44 @@ const PatientDashboard = () => {
             </h2>
           </div>
           <div className="space-y-3">
-            <h3 className="text-lg font-medium text-light-text dark:text-dark-text">
-              Dr. Jane Muthoni
-            </h3>
-            <div className="text-light-secondary dark:text-dark-secondary space-y-1">
-              <p className="flex items-center gap-2">
-                <Clock className="w-4 h-4 text-light-accent dark:text-dark-accent" />{" "}
-                2023-10-01
-              </p>
-              <p className="flex items-center gap-2">
-                <Clock className="w-4 h-4 text-light-accent dark:text-dark-accent" />{" "}
-                10:00 AM
-              </p>
-            </div>
-            <button className="w-full mt-4 bg-light-accent dark:bg-dark-accent hover:bg-light-hover dark:hover:bg-dark-hover text-white dark:text-white font-medium rounded-lg p-3 duration-300 transition-all hover:shadow-md">
-              View Details
-            </button>
+            {upcomingAppointment ? (
+              <>
+                <h3 className="text-lg font-medium text-light-text dark:text-dark-text"></h3>
+                <p className="text-light-secondary dark:text-dark-secondary">
+                  {new Date(upcomingAppointment.date).toLocaleDateString()} at{" "}
+                  {new Date(upcomingAppointment.date).toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </p>
+                <p className="text-light-secondary dark:text-dark-secondary">
+                  Status:{" "}
+                  <span
+                    className={`font-semibold ${
+                      upcomingAppointment.status === "Confirmed"
+                        ? "text-light-success dark:text-dark-success"
+                        : "text-light-warning dark:text-dark-warning"
+                    }`}
+                  >
+                    {upcomingAppointment.status}
+                  </span>
+                </p>
+
+                <button className="w-full mt-4 bg-light-accent dark:bg-dark-accent hover:bg-light-hover dark:hover:bg-dark-hover text-white dark:text-white font-medium rounded-lg p-3 duration-300 transition-all hover:shadow-md">
+                  View Details
+                </button>
+              </>
+            ) : (
+              <>
+                <p className="text-light-secondary dark:text-dark-secondary">
+                  No upcoming appointments
+                </p>
+
+                <button className="w-full mt-4 bg-light-accent dark:bg-dark-accent hover:bg-light-hover dark:hover:bg-dark-hover text-white dark:text-white font-medium rounded-lg p-3 duration-300 transition-all hover:shadow-md">
+                  Book Appointment
+                </button>
+              </>
+            )}
           </div>
         </div>
         {/* Triage result card */}
@@ -122,7 +210,7 @@ const PatientDashboard = () => {
           <div className="flex items-center gap-3 mb-4">
             <Brain className="w-8 h-8 text-light-logo-blue dark:text-dark-logo-blue" />
             <h2 className="text-xl font-semibold text-light-text dark:text-dark-text">
-              Triage Results
+              Latest Triage Results
             </h2>
           </div>
           <div className="space-y-3">
@@ -137,14 +225,44 @@ const PatientDashboard = () => {
                 <div className="text-light-secondary dark:text-dark-secondary space-y-1 text-sm">
                   <p>
                     Urgency:{" "}
-                    <span className="font-semibold text-light-error dark:text-dark-error">
-                      {result.urgency}
+                    <span
+                      className={`font-semibold ${
+                        result.urgency === "high"
+                          ? "text-light-error dark:text-dark-error"
+                          : result.urgency === "medium"
+                          ? "text-light-warning dark:text-dark-warning"
+                          : "text-light-success dark:text-dark-success"
+                      }`}
+                    >
+                      {result.urgency.toUpperCase()}
                     </span>
                   </p>
                   <p>Specialist: {result.specialist}</p>
                   <p>Date: {result.date}</p>
+                  <div className="mt-2">
+                    <p className="font-medium mb-1">Possible Conditions:</p>
+                    <ul className="list-disc list-inside">
+                      {result.conditions.map((condition) => (
+                        <li key={condition._id} className="text-xs">
+                          {condition.condition}{" "}
+                          <span
+                            className={`${
+                              condition.confidenceLevel === "high"
+                                ? "text-light-error dark:text-dark-error"
+                                : "text-light-warning dark:text-dark-warning"
+                            }`}
+                          >
+                            ({condition.confidenceLevel})
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 </div>
-                <button className="mt-2 bg-light-logo-blue dark:bg-dark-logo-blue hover:bg-opacity-90 dark:hover:bg-opacity-90 text-white font-medium rounded-lg p-2 transition-all duration-300 hover:shadow-md">
+                <button
+                  onClick={() => setSelectedTriage(result)}
+                  className="mt-2 bg-light-logo-blue dark:bg-dark-logo-blue hover:bg-opacity-90 dark:hover:bg-opacity-90 text-white font-medium rounded-lg p-2 transition-all duration-300 hover:shadow-md w-full"
+                >
                   View Details
                 </button>
               </div>

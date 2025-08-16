@@ -22,6 +22,7 @@ export const getAppointments = async (req, res) => {
   const { patientId } = req.params;
   try {
     const appointments = await Appointment.find({ patientId })
+      .sort({ date: -1 })
       .populate({ path: "doctorId", select: "fullname", model: "User" })
       .exec();
     res.status(200).json(appointments);

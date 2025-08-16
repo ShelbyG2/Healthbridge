@@ -11,7 +11,7 @@ const TriageSchema = new mongoose.Schema(
       duration: { type: String, required: true },
       severity: {
         type: String,
-        enum: ["mild", "moderate", "severe"],
+        enum: ["mild", "moderate", "severe", "critical"],
         required: true,
       },
       onset: { type: String, required: true },

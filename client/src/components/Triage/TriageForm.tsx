@@ -22,7 +22,7 @@ export const TriageForm = ({
   return (
     <form
       onSubmit={onSubmit}
-      className="space-y-6 bg-white dark:bg-dark-card p-6 rounded-lg shadow-md"
+      className="space-y-6 bg-white dark:bg-dark-card p-6 rounded-lg shadow-md h-full"
     >
       {isDisabled && (
         <div className="bg-yellow-50 dark:bg-yellow-900 p-4 rounded-md mb-4">

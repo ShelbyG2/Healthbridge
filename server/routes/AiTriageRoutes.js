@@ -181,5 +181,57 @@ router.get("/patient/:patientId/triage", protect, async (req, res) => {
     console.error(error);
   }
 });
+router.get("/patient/:patientId/triage/count", protect, async (req, res) => {
+  try {
+    const { patientId } = req.params;
+
+    // Get start and end of current day in UTC
+    const today = new Date();
+    const startOfDay = new Date(today.setHours(0, 0, 0, 0));
+    const endOfDay = new Date(today.setHours(23, 59, 59, 999));
+
+    const count = await Triage.countDocuments({
+      patientId,
+      createdAt: {
+        $gte: startOfDay,
+        $lte: endOfDay,
+      },
+    });
+
+    res.status(200).json({ count });
+  } catch (error) {
+    console.error("Error fetching triage count:", error);
+    res.status(500).json({
+      message: "Failed to fetch triage count",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined,
+    });
+  }
+});
+router.get("/patient/:patientId/triage/daily", protect, async (req, res) => {
+  try {
+    const { patientId } = req.params;
+
+    // Get start and end of current day in UTC
+    const today = new Date();
+    const startOfDay = new Date(today.setHours(0, 0, 0, 0));
+    const endOfDay = new Date(today.setHours(23, 59, 59, 999));
+
+    const triages = await Triage.find({
+      patientId,
+      createdAt: {
+        $gte: startOfDay,
+        $lte: endOfDay,
+      },
+    }).sort({ createdAt: -1 }); // Most recent first
+
+    res.status(200).json({ triages });
+  } catch (error) {
+    console.error("Error fetching daily triages:", error);
+    res.status(500).json({
+      message: "Failed to fetch daily triages",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined,
+    });
+  }
+});
 
 export default router;
