@@ -1,9 +1,8 @@
-import { useState, useEffect, useContext } from "react";
+import { useContext, useEffect } from "react";
 import { AuthContext } from "../../context/AuthProvider";
 import type { Triage } from "../../types/Triage";
 import { API_URL } from "../../lib/utils";
 import { TriageResults } from "./TriageResults";
-import { format } from "date-fns";
 
 interface DailyTriageResultsProps {
   onNewTriage: () => void;
@@ -26,7 +25,7 @@ export const DailyTriageResults = ({
     const fetchDailyTriages = async () => {
       try {
         const response = await fetch(
-          `${API_URL}/patient/${user?._id}/triage/daily`,
+          `${API_URL}/api/patient/${user?._id}/triage/daily`,
           {
             credentials: "include",
             headers: { "Content-Type": "application/json" },
@@ -36,9 +35,9 @@ export const DailyTriageResults = ({
         if (!response.ok) throw new Error("Failed to fetch daily triages");
 
         const { triages } = await response.json();
-        setTriages(triages);
+        // Removed setTriages as we're using props directly
         if (triages.length > 0) {
-          setSelectedTriage(triages[0]);
+          // Removed setSelectedTriage as we're using props directly
         }
       } catch (error) {
         console.error("Error fetching daily triages:", error);

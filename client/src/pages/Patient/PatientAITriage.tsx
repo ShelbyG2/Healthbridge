@@ -151,7 +151,7 @@ const PatientAITriage = () => {
   if (isLoading) return <LoadSpinner />;
 
   return (
-    <div className="flex-1 min-h-screen">
+    <div className="flex flex-1 flex-col min-h-screen">
       {/* Futuristic Header */}
       <header className="relative overflow-hidden">
         <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
@@ -200,7 +200,7 @@ const PatientAITriage = () => {
                     className={`px-4 py-2 rounded-full transition-all duration-300 whitespace-nowrap
                       ${
                         selectedTriage?._id === triage._id
-                          ? `${buttonStyles.primary}`
+                          ? "bg-light-accent dark:bg-dark-accent text-white dark:text-dark-text" // Removed *: prefix
                           : "bg-light-surface dark:bg-dark-surface text-light-text dark:text-dark-text"
                       } hover:scale-105`}
                   >
@@ -215,7 +215,7 @@ const PatientAITriage = () => {
       </header>
 
       {/* Main Content Area */}
-      <div className="bg-light-bg dark:bg-dark-bg h-full overflow-auto">
+      <div className="bg-light-bg dark:bg-dark-bg flex-1 overflow-y-auto">
         {isLoading ? (
           <LoadSpinner />
         ) : !showResults ? (
